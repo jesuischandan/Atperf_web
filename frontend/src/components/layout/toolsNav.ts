@@ -8,6 +8,7 @@ export interface NavContext {
     isUser: boolean;          // external user session (tools need it)
     isStaff: boolean;         // internal staff session
     isExternalAdmin: boolean;
+    isMaintenancePilot: boolean;  // the user's company runs a STRAP Maintenance pilot
 }
 
 export interface NavItem {
@@ -52,8 +53,7 @@ export const TOOLS_NAV: NavItem[] = [
         icon: Wrench,
         label: { en: 'STRAP Maintenance', fr: 'STRAP Maintenance' },
         badge: { en: 'Prototype', fr: 'Prototype' },
-        // Phase 3 adds pilot clients through a company-level flag.
-        visible: ctx => ctx.isStaff,
+        visible: ctx => ctx.isStaff || ctx.isMaintenancePilot,
     },
 ];
 

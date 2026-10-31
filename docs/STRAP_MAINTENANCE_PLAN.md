@@ -76,43 +76,72 @@ Open point for Rachid: final wording review FR + EN on the three new screens.
   the header gains a "StrAP Tools" button for logged-in users.
 - Fixed horizontal scrolling on phones for the Dashboard tabs and Admin sub-tabs.
 
-## Phase 3 — STRAP Maintenance prototype (≈ 4 weeks)
+## Phase 3 — STRAP Maintenance prototype ✅
 
-**Backend** — `api/strap_maintenance.py`; tables `maint_datasets`, `maint_equipments`,
-`maint_notices`, `maint_work_orders`, `maint_links`, `maint_scoring_configs` (versioned),
-`maint_scores` (per notice, per as-of date, per-criterion breakdown), `maint_expert_validations`
-(audit log). All rows scoped by company; access = staff + pilot clients (new
-`maintenance_pilot` flag on companies, toggled in the Admin panel).
+**Access** — Atperf staff see every dataset; users of a company with the new
+`companies.maintenance_pilot` flag see their own company's datasets only. Only staff can switch
+the flag (Admin → Companies → "STRAP Maintenance" column). The sidebar entry appears for staff
+and pilot users; the cached profile is refreshed from `/me` so a newly enabled pilot sees it
+without logging in again. The column is added automatically at API start-up (`ensure_columns`
+in `main.py`) and also in `migrate_db.py`.
 
-**Import** — Excel / CSV with pandas; generic column-mapping step (StrAPilot pattern) since no
-real SAP PM headers are available yet; validation report (missing dates, unknown equipment,
-undefined flow).
+**Backend** — `backend/maintenance/engine.py` (scoring, links, replay, backtest),
+`backend/maintenance/importer.py` (Excel / CSV, mapping, validation report),
+`backend/api/strap_maintenance.py` (`/api/maintenance/...`). Tables: `maint_datasets`,
+`maint_equipments`, `maint_notices`, `maint_work_orders`, `maint_links` (matches from the
+imported file) and `maint_decisions` (audit log of validations, rejections, corrections and
+parameter changes, with the score at the time). Scores are computed on demand rather than
+stored, so they always reflect the current parameters; the decision log keeps a snapshot.
 
-**Scoring engine** — deterministic Python, as-of date T (no future data):
+**Import** — one Excel workbook (one sheet per table) or up to four CSV files; tables and
+columns detected from French / English / SAP-style names, editable before import. Report lists
+skipped rows (missing date or identifier, undefined flow, duplicates) and assets created because
+they were missing from the reference list. The fictive workbook is bundled
+(`backend/maintenance/sample/`) and loadable in one click.
+
+**Scoring (as of date T, data before T only)**
 
 | Criterion | Pts | V1 rule |
 |---|---|---|
-| Criticality | 25 | Equipment reference list |
-| Recurrence | 20 | Earlier notices on same equipment / sub-assembly in a window |
-| Historical similarity | 20 | Earlier red WOs with a matching symptom family (rule table) |
-| Age / postponements | 15 | Age at T + number of postponements |
-| Symptom severity | 10 | Business rules on symptom text |
-| Aggravating context | 10 | Manual entry |
+| Criticality | 25 | Reference list (critique 5, élevée 4, moyenne 3, faible 1; 3 if missing) |
+| Recurrence | 20 | Earlier yellow notices on the same asset within 180 days (capped at 5) |
+| Historical similarity | 20 | Earlier red WO on the same asset: 5 same symptom family, 3 other family; 2 same sub-assembly + family |
+| Age / postponements | 15 | 0–3 by age (≥15 / 45 / 90 days) + 1 if postponed, +2 if ≥3 postponements |
+| Symptom severity | 10 | By family (thermal / pressure 4; sealing / vibration / flow / mechanical 3; electrical 2) +1 if worsening |
+| Aggravating context | 10 | Manual entry by an expert |
 
-Expert overrides of any note are logged. Weights and thresholds configurable per dataset.
+Symptom families come from a keyword table (sealing, pressure, vibration, mechanical, thermal,
+electrical, flow). Experts can override any note; overrides are logged and shown in the sheet.
+Limit: the number of postponements is only known as a final count.
 
-**Links engine** — candidate yellow → red when earlier date, same equipment or sub-assembly,
-within a window and compatible symptom family; always a hypothesis until an expert decides.
+**Links** — candidate yellow → red when earlier, within 90 days, and same asset (strong if a
+symptom family is shared, medium otherwise) or same sub-assembly with a shared family (weak).
+Imported matches are shown with their status. Experts validate or reject each one.
 
-**Replay / backtest** — score precursors at several as-of dates; coverage, false alerts,
-undetectable breakdowns, threshold trade-off.
+**Replay / backtest** — each notice is rescored as in a weekly review using only data known
+on that date. Replay shows, for one breakdown, the precursors, their score at creation and the
+day before, and when they would first have been flagged. Backtest reports coverage, alerts,
+alerts with no later breakdown, breakdowns without precursor and median lead time, with
+threshold and horizon sliders.
 
-**Cockpit UI** — same screens as the Phase 1 simulator, backed by the API, plus import,
-persisted expert decisions, decision history and Excel / PDF export.
+**Cockpit** (`/tool/strap-maintenance`, inside the tools sidebar) — datasets list, import
+wizard, then per dataset: Overview (KPIs + timeline), Prioritised yellows (filters, sheet with
+explanations, history, links, suggested checks, validate / reject / correct), Replay, Alert
+measurement, Parameters (weights must total 100, thresholds, windows, rules), Log, Excel export.
 
-**Tests** — scenarios T01–T10 from the Excel file as automated tests (T08 critical).
+**Tests** — 18 new backend tests (56 in total): access rules, pilot flag, CSV import and
+report, scenarios T01–T10 from the workbook (T08: removing every record after T leaves past
+scores unchanged), replay, backtest, export, deletion. End-to-end browser run: staff enables
+the pilot, loads the fictive dataset, corrects and validates a notice, replays, measures,
+saves parameters, exports, imports two CSV files; the pilot client sees only its company.
 
-Out of scope V1: real-time SAP, automatic WO creation, LCC economics.
+**First calibration result on the fictive data** — with the automatic rules and no context
+entered, the 75/100 threshold flags 1 of 36 breakdowns (10 alerts); around 55–60 it covers
+15–19 of 36 with ~40 alerts not followed by a breakdown. The fictive workbook's notes were set
+by hand, so the rules need calibrating with a maintenance expert on real history — which is what
+the Parameters and Alert-measurement tabs are for.
+
+Out of scope V1: real-time SAP, automatic WO creation, LCC economics, PDF export (Excel only).
 
 ## Estimate
 
@@ -121,10 +150,10 @@ Out of scope V1: real-time SAP, automatic WO creation, LCC economics.
 | 1. Discover section + dedicated page + simulator | 4–5 | ✅ done |
 | 0. Auth / CORS / rate limiting | 2–3 | ✅ done |
 | 2. Sidebar + route migration | 2–3 | ✅ done |
-| 3. Data model + import + mapping | 3–4 | next |
-| 3. Scoring + links engines | 3–4 | |
-| 3. Replay / backtest | 2–3 | |
-| 3. Cockpit UI (reusing simulator components) | 4–5 | |
-| 3. Expert validation + audit log | 2 | |
-| Tests, translations, QA, deployment | 2–3 | |
-| **Remaining** | **≈ 15–21 days** | |
+| 3. Data model + import + mapping | 3–4 | ✅ done |
+| 3. Scoring + links engines | 3–4 | ✅ done |
+| 3. Replay / backtest | 2–3 | ✅ done |
+| 3. Cockpit UI (reusing simulator components) | 4–5 | ✅ done |
+| 3. Expert validation + audit log | 2 | ✅ done |
+| Tests, translations, QA, deployment | 2–3 | ✅ done |
+| **Remaining** | **Deployment + pilot calibration** | |

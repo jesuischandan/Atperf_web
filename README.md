@@ -17,6 +17,9 @@ An AI-powered data analysis tool. Users upload a dataset and StrAPilot automatic
 ### 📋 ProExtract *(SubmitForm)*
 A structured problem-capture tool that converts free-text operational issues into formatted tickets. It extracts root causes, involved tools, priority level, and generates a resolution plan alongside an industry benchmark gap analysis — all powered by AI.
 
+### 🔧 STRAP Maintenance *(prototype)*
+Prioritises deferred / opportunity maintenance notifications ("yellow") at risk of becoming breakdowns ("red"). Import notification and work-order history from Excel or CSV, get an explainable score /100 per notification, replay past breakdowns, measure alerts against history and record expert decisions. Available to Atperf staff and to companies with the STRAP Maintenance pilot enabled in the Admin panel. See `docs/STRAP_MAINTENANCE_PLAN.md`.
+
 ### 🏢 Internal Staff Portal (ProStaff)
 A dedicated login and registration flow for internal Atperf staff, separate from external users. Staff members get access to an **Admin Panel** for user management and an **Admin Use Cases** interface for curating content.
 

@@ -5,6 +5,7 @@ import ProfileModal from '../ProfileModal';
 import { ADMIN_NAV, TOOLS_NAV, isActive, type NavContext, type NavItem } from './toolsNav';
 import { STAFF_KEY, USER_KEY, logout } from '../../utils/apiClient';
 import { useLang } from '../../utils/useLang';
+import API_URL from '../../utils/apiUrl';
 
 /* ─────────────────────────────────────────────────────────────
    Shared shell for the logged-in StrAP tools: sidebar on desktop
@@ -27,7 +28,7 @@ function readJson<T>(key: string): T | null {
     }
 }
 
-type StoredUser = { user_id?: string; first_name?: string; last_name?: string; email?: string; role?: string };
+type StoredUser = { user_id?: string; first_name?: string; last_name?: string; email?: string; role?: string; maintenance_pilot?: number };
 type StoredStaff = { staff_id?: string; first_name?: string; internal_role?: string };
 
 export default function ToolsLayout() {
@@ -47,6 +48,16 @@ export default function ToolsLayout() {
     // Close the mobile drawer whenever the route changes.
     useEffect(() => { setDrawerOpen(false); }, [pathname]);
 
+    // Refresh the cached profile once per visit (role or STRAP Maintenance access may have changed).
+    useEffect(() => {
+        if (!readJson<StoredUser>(USER_KEY)) return;
+        fetch(`${API_URL}/me`).then(r => (r.ok ? r.json() : null)).then((u: StoredUser | null) => {
+            if (!u) return;
+            localStorage.setItem(USER_KEY, JSON.stringify(u));
+            setUser(u);
+        }).catch(() => undefined);
+    }, []);
+
     const toggleCollapsed = () => {
         setCollapsed(c => {
             try { localStorage.setItem(COLLAPSE_KEY, c ? '0' : '1'); } catch { /* ignore */ }
@@ -58,6 +69,7 @@ export default function ToolsLayout() {
         isUser: !!user,
         isStaff: !!staff,
         isExternalAdmin: user?.role === 'admin' || user?.role === 'super_admin',
+        isMaintenancePilot: !!user?.maintenance_pilot,
     };
     const items = TOOLS_NAV.filter(i => !i.visible || i.visible(ctx));
     const showAdmin = !ADMIN_NAV.visible || ADMIN_NAV.visible(ctx);

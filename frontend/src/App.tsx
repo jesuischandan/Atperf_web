@@ -21,6 +21,8 @@ import DiscoverStrAP from './components/DiscoverStrAP';
 import StrapSoftwareMaintenancePage from './components/maintenance/StrapSoftwareMaintenancePage';
 import StrapMaintenanceDemo from './components/maintenance/StrapMaintenanceDemo';
 import ToolsLayout from './components/layout/ToolsLayout';
+import MaintenanceHome from './components/maintenance/cockpit/MaintenanceHome';
+import MaintenanceCockpit from './components/maintenance/cockpit/MaintenanceCockpit';
 
 function App() {
     return (
@@ -49,7 +51,8 @@ function App() {
                     <Route path="/submit" element={<SubmitForm />} />
                     <Route path="/decision-radar" element={<DecisionRadar />} />
                     <Route path="/tool/strapilot/app" element={<Strapilot />} />
-                    <Route path="/tool/strap-maintenance" element={<StrapMaintenanceDemo embedded />} />
+                    <Route path="/tool/strap-maintenance" element={<MaintenanceHome />} />
+                    <Route path="/tool/strap-maintenance/:id" element={<MaintenanceCockpit />} />
                     <Route path="/admin" element={<AdminPanel />} />
                 </Route>
                 <Route path="*" element={<Navigate to="/" replace />} />

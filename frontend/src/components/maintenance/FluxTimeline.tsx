@@ -1,36 +1,53 @@
-import type { Equipment, Notice, ScoredNotice, WorkOrder } from './scoring';
-
 /* ─────────────────────────────────────────────────────────────
-   Swimlane timeline: one row per equipment, red / green / yellow events
-───────────────────────────────────────────────────────────── */
+   Swimlane timeline: one row per equipment, red / green / yellow events.
+   Shared by the public simulator and the STRAP Maintenance cockpit.
+───────────────────────────────────────────────────────────────── */
+
+export type Priority = 'HIGH' | 'MEDIUM' | 'LOW';
+
+export interface TimelineEquipment {
+    id: string;
+    name: string;
+    tag: string;
+}
+
+export interface TimelineEvent {
+    id: string;
+    date: string;
+    equipmentId: string;
+    kind: 'red' | 'green' | 'yellow';
+    label: string;            // tooltip text
+    priority?: Priority;      // yellow notices only
+}
 
 const ROW_H = 30;
 const LABEL_W = 190;
 const WIDTH = 1000;
 const PAD_TOP = 26;
 
-const YELLOW_FILL = { HIGH: '#d97706', MEDIUM: '#fbbf24', LOW: '#fde68a' } as const;
+const YELLOW_FILL: Record<Priority, string> = { HIGH: '#d97706', MEDIUM: '#fbbf24', LOW: '#fde68a' };
 
 interface Props {
-    equipments: Equipment[];
-    yellows: ScoredNotice[];
-    greens: Notice[];
-    workOrders: WorkOrder[];
+    equipments: TimelineEquipment[];
+    events: TimelineEvent[];
     start: string;
     end: string;
     lang: 'en' | 'fr';
     highlight?: Set<string>;
-    onSelect?: (noticeId: string) => void;
+    onSelect?: (yellowId: string) => void;
 }
 
-export default function FluxTimeline({ equipments, yellows, greens, workOrders, start, end, lang, highlight, onSelect }: Props) {
+export default function FluxTimeline({ equipments, events, start, end, lang, highlight, onSelect }: Props) {
     const t0 = Date.parse(start);
     const t1 = Date.parse(end);
     const plotW = WIDTH - LABEL_W - 32;
     const x = (d: string) => LABEL_W + ((Date.parse(d) - t0) / (t1 - t0)) * plotW;
-    const inRange = (d: string) => { const v = Date.parse(d); return v >= t0 && v <= t1; };
     const rowY = new Map(equipments.map((e, i) => [e.id, PAD_TOP + i * ROW_H + ROW_H / 2]));
     const height = PAD_TOP + equipments.length * ROW_H + 8;
+    const visible = events.filter(ev => {
+        const v = Date.parse(ev.date);
+        return v >= t0 && v <= t1 && rowY.has(ev.equipmentId);
+    });
 
     // Month ticks (thinned so labels never overlap)
     const ticks: { d: string; label: string }[] = [];
@@ -38,13 +55,12 @@ export default function FluxTimeline({ equipments, yellows, greens, workOrders, 
     cursor.setUTCDate(1);
     cursor.setUTCMonth(cursor.getUTCMonth() + 1);
     const months = Math.max(1, Math.round((t1 - t0) / (30 * 86_400_000)));
-    const step = months > 12 ? 2 : 1;
+    const step = months > 24 ? 3 : months > 12 ? 2 : 1;
     let k = 0;
     while (cursor.getTime() <= t1) {
         if (k % step === 0) {
-            const iso = cursor.toISOString().slice(0, 10);
             ticks.push({
-                d: iso,
+                d: cursor.toISOString().slice(0, 10),
                 label: cursor.toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-GB', { month: 'short', year: '2-digit', timeZone: 'UTC' }),
             });
         }
@@ -58,7 +74,6 @@ export default function FluxTimeline({ equipments, yellows, greens, workOrders, 
         <div className="overflow-x-auto">
             <svg viewBox={`0 0 ${WIDTH} ${height}`} className="w-full min-w-[720px]" role="img"
                 aria-label={lang === 'fr' ? 'Chronologie des flux par équipement' : 'Flow timeline by equipment'}>
-                {/* Grid */}
                 {ticks.map(tk => (
                     <g key={tk.d}>
                         <line x1={x(tk.d)} x2={x(tk.d)} y1={PAD_TOP - 6} y2={height - 8} stroke="#e2e8f0" />
@@ -68,38 +83,40 @@ export default function FluxTimeline({ equipments, yellows, greens, workOrders, 
                 {equipments.map((e, i) => (
                     <g key={e.id}>
                         {i % 2 === 0 && <rect x={0} y={PAD_TOP + i * ROW_H} width={WIDTH} height={ROW_H} fill="#f8fafc" />}
-                        <text x={8} y={rowY.get(e.id)! + 4} fontSize="11" fill="#334155" fontWeight={600}>{e.tag}</text>
-                        <text x={62} y={rowY.get(e.id)! + 4} fontSize="10" fill="#64748b">
-                            {e.name.length > 20 ? e.name.slice(0, 19) + '…' : e.name}
+                        <text x={8} y={rowY.get(e.id)! + 4} fontSize="11" fill="#334155" fontWeight={600}>
+                            {e.tag.length > 9 ? e.tag.slice(0, 8) + '…' : e.tag}
+                        </text>
+                        <text x={70} y={rowY.get(e.id)! + 4} fontSize="10" fill="#64748b">
+                            {e.name.length > 19 ? e.name.slice(0, 18) + '…' : e.name}
                         </text>
                     </g>
                 ))}
 
-                {/* Green: preventive notices + work orders */}
-                {[...greens, ...workOrders.filter(o => o.flux === 'VERT')].filter(ev => inRange(ev.date) && rowY.has(ev.equipmentId)).map(ev => (
+                {visible.filter(ev => ev.kind === 'green').map(ev => (
                     <circle key={ev.id} cx={x(ev.date)} cy={rowY.get(ev.equipmentId)!} r={3.5} fill="#10b981" opacity={dim(ev.id) ? 0.25 : 0.9}>
-                        <title>{`${ev.id} · ${ev.date} · ${lang === 'fr' ? 'Préventif' : 'Preventive'}`}</title>
+                        <title>{ev.label}</title>
                     </circle>
                 ))}
 
-                {/* Yellow notices, shade = priority class */}
-                {yellows.filter(n => inRange(n.date) && rowY.has(n.equipmentId)).map(n => (
-                    <circle key={n.id} cx={x(n.date)} cy={rowY.get(n.equipmentId)!} r={n.priority === 'HIGH' ? 6.5 : 5}
-                        fill={YELLOW_FILL[n.priority]} stroke={n.priority === 'HIGH' ? '#78350f' : '#b45309'} strokeWidth={n.priority === 'HIGH' ? 1.5 : 0.75}
-                        opacity={dim(n.id) ? 0.25 : 1}
-                        className={onSelect ? 'cursor-pointer' : undefined}
-                        onClick={onSelect ? () => onSelect(n.id) : undefined}>
-                        <title>{`${n.id} · ${n.date} · ${n.symptom} · ${n.score}/100`}</title>
-                    </circle>
-                ))}
-
-                {/* Red breakdowns */}
-                {workOrders.filter(o => o.flux === 'ROUGE' && inRange(o.date) && rowY.has(o.equipmentId)).map(o => {
-                    const cx = x(o.date), cy = rowY.get(o.equipmentId)!;
+                {visible.filter(ev => ev.kind === 'yellow').map(ev => {
+                    const p = ev.priority ?? 'LOW';
                     return (
-                        <rect key={o.id} x={cx - 5} y={cy - 5} width={10} height={10} fill="#dc2626"
-                            transform={`rotate(45 ${cx} ${cy})`} opacity={dim(o.id) ? 0.25 : 1}>
-                            <title>{`${o.id} · ${o.date} · ${o.symptom} · ${o.downtimeHours} h`}</title>
+                        <circle key={ev.id} cx={x(ev.date)} cy={rowY.get(ev.equipmentId)!} r={p === 'HIGH' ? 6.5 : 5}
+                            fill={YELLOW_FILL[p]} stroke={p === 'HIGH' ? '#78350f' : '#b45309'} strokeWidth={p === 'HIGH' ? 1.5 : 0.75}
+                            opacity={dim(ev.id) ? 0.25 : 1}
+                            className={onSelect ? 'cursor-pointer' : undefined}
+                            onClick={onSelect ? () => onSelect(ev.id) : undefined}>
+                            <title>{ev.label}</title>
+                        </circle>
+                    );
+                })}
+
+                {visible.filter(ev => ev.kind === 'red').map(ev => {
+                    const cx = x(ev.date), cy = rowY.get(ev.equipmentId)!;
+                    return (
+                        <rect key={ev.id} x={cx - 5} y={cy - 5} width={10} height={10} fill="#dc2626"
+                            transform={`rotate(45 ${cx} ${cy})`} opacity={dim(ev.id) ? 0.25 : 1}>
+                            <title>{ev.label}</title>
                         </rect>
                     );
                 })}

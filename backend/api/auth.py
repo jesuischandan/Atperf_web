@@ -169,6 +169,7 @@ def login(login_in: schemas.UserLogin, request: Request, response: Response, gcp
     user_dict = {c.name: getattr(user, c.name) for c in user.__table__.columns}
     if company:
         user_dict["company_name"] = company.company_name
+        user_dict["maintenance_pilot"] = company.maintenance_pilot or 0
 
     set_session_cookie(response, request, "user", user.user_id)
     return user_dict
@@ -185,6 +186,7 @@ def me(user: models.ExternalUser = Depends(require_user), gcp_db: Session = Depe
     user_dict = {c.name: getattr(user, c.name) for c in user.__table__.columns}
     if company:
         user_dict["company_name"] = company.company_name
+        user_dict["maintenance_pilot"] = company.maintenance_pilot or 0
     return user_dict
 
 

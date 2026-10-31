@@ -1,11 +1,10 @@
 import { useMemo, useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { AlertTriangle, ArrowLeft, CheckCircle2, Info, RotateCcw, SlidersHorizontal, XCircle, PencilLine } from 'lucide-react';
 import LandingPageNav from '../LandingPageNav';
 import Footer from '../Footer';
 import { useLang } from '../../utils/useLang';
-import { STAFF_KEY } from '../../utils/apiClient';
-import FluxTimeline, { TimelineLegend } from './FluxTimeline';
+import FluxTimeline, { TimelineLegend, type TimelineEquipment, type TimelineEvent } from './FluxTimeline';
 import {
     CRITERIA, DATA, DEFAULT_THRESHOLDS, DEFAULT_WEIGHTS, breakdown, daysBetween, drivers, equipmentById,
     metrics, precursors, redWorkOrders, scoreAll, weightsTotal,
@@ -191,11 +190,7 @@ function ScoreBar({ value, priority }: { value: number; priority: PriorityClass 
     );
 }
 
-/**
- * `embedded`: rendered inside the StrAP tools sidebar (staff, later pilot clients) instead of
- * as a public page with the site header and footer.
- */
-export default function StrapMaintenanceDemo({ embedded = false }: { embedded?: boolean }) {
+export default function StrapMaintenanceDemo() {
     const navigate = useNavigate();
     const [lang, switchLang] = useLang();
     const t = T[lang];
@@ -217,6 +212,15 @@ export default function StrapMaintenanceDemo({ embedded = false }: { embedded?: 
 
     const scored = useMemo(() => scoreAll(weights, thresholds), [weights, thresholds]);
     const total = weightsTotal(weights);
+
+    const timelineEquipments: TimelineEquipment[] = DATA.equipments.map(e => ({ id: e.id, name: e.name, tag: e.tag }));
+    const timelineEvents: TimelineEvent[] = [
+        ...greens.map(n => ({ id: n.id, date: n.date, equipmentId: n.equipmentId, kind: 'green' as const, label: `${n.id} · ${n.date}` })),
+        ...scored.map(n => ({ id: n.id, date: n.date, equipmentId: n.equipmentId, kind: 'yellow' as const, priority: n.priority,
+            label: `${n.id} · ${n.date} · ${n.symptom} · ${n.score}/100` })),
+        ...DATA.workOrders.map(o => ({ id: o.id, date: o.date, equipmentId: o.equipmentId, kind: o.flux === 'ROUGE' ? 'red' as const : 'green' as const,
+            label: `${o.id} · ${o.date} · ${o.symptom}` })),
+    ];
 
     const filtered = scored.filter(n =>
         (prioFilter === 'ALL' || n.priority === prioFilter) &&
@@ -253,22 +257,15 @@ export default function StrapMaintenanceDemo({ embedded = false }: { embedded?: 
     const allDates = [...DATA.notices.map(n => n.date), ...DATA.workOrders.map(o => o.date)].sort();
     const range = { start: shiftDays(allDates[0], -10), end: shiftDays(allDates[allDates.length - 1], 10) };
 
-    // Inside the tools shell the module is staff-only for now; everyone else gets the public simulator.
-    if (embedded && !localStorage.getItem(STAFF_KEY)) {
-        return <Navigate to="/strap-software/maintenance/demo" replace />;
-    }
-
     return (
-        <div className={`${embedded ? '' : 'min-h-screen'} bg-white text-slate-900 antialiased flex flex-col`} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
-            {!embedded && <LandingPageNav lang={lang} onLangChange={switchLang} />}
+        <div className="min-h-screen bg-white text-slate-900 antialiased flex flex-col" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
+            <LandingPageNav lang={lang} onLangChange={switchLang} />
 
-            <main className={`flex-1 ${embedded ? 'pt-8' : 'pt-24'} pb-16 px-4 sm:px-6`}>
+            <main className="flex-1 pt-24 pb-16 px-4 sm:px-6">
                 <div className="max-w-7xl mx-auto">
-                    {!embedded && (
-                        <button onClick={() => navigate('/strap-software/maintenance')} className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-[#FF6B00] mb-4">
-                            <ArrowLeft size={15} /> {t.back}
-                        </button>
-                    )}
+                    <button onClick={() => navigate('/strap-software/maintenance')} className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-[#FF6B00] mb-4">
+                        <ArrowLeft size={15} /> {t.back}
+                    </button>
                     <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight mb-2">{t.title}</h1>
                     <p className="text-slate-500 text-base sm:text-lg mb-6">{t.subtitle}</p>
 
@@ -346,7 +343,7 @@ export default function StrapMaintenanceDemo({ embedded = false }: { embedded?: 
                                 <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">{t.fictive}</span>
                             </div>
                             <div className="border border-slate-200 rounded-xl p-3 mb-3">
-                                <FluxTimeline equipments={DATA.equipments} yellows={scored} greens={greens} workOrders={DATA.workOrders}
+                                <FluxTimeline equipments={timelineEquipments} events={timelineEvents}
                                     start={range.start} end={range.end} lang={lang} onSelect={openNotice} />
                             </div>
                             <div className="flex flex-wrap justify-between gap-3">
@@ -459,8 +456,9 @@ export default function StrapMaintenanceDemo({ embedded = false }: { embedded?: 
 
                             <div className="border border-slate-200 rounded-xl p-3 mb-6">
                                 <FluxTimeline
-                                    equipments={[equipmentById.get(replayOt.equipmentId)!, ...[...new Set(pre.filter(p => !p.sameEquipment).map(p => p.notice.equipmentId))].map(id => equipmentById.get(id)!)]}
-                                    yellows={scored} greens={greens} workOrders={DATA.workOrders}
+                                    equipments={[replayOt.equipmentId, ...new Set(pre.filter(p => !p.sameEquipment).map(p => p.notice.equipmentId))]
+                                        .map(id => timelineEquipments.find(e => e.id === id)!)}
+                                    events={timelineEvents}
                                     start={shiftDays(replayOt.date, -horizon - 10)} end={shiftDays(replayOt.date, 15)} lang={lang}
                                     highlight={new Set([replayOt.id, ...pre.map(p => p.notice.id)])} onSelect={openNotice}
                                 />
@@ -557,7 +555,7 @@ export default function StrapMaintenanceDemo({ embedded = false }: { embedded?: 
                 </div>
             </main>
 
-            {!embedded && <Footer lang={lang} />}
+            <Footer lang={lang} />
         </div>
     );
 }
