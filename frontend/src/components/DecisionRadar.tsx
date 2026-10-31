@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Navigation, ArrowLeft, ArrowRight, Zap, AlertTriangle, Plus, Trash2, CheckCircle2, Download, Mail, Loader2 } from 'lucide-react';
+import { ArrowRight, Zap, AlertTriangle, Plus, Trash2, CheckCircle2, Download, Mail, Loader2 } from 'lucide-react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { generateRadarPDF } from '../utils/pdfGenerator';
 import html2canvas from 'html2canvas';
 
 import API_URL from '../utils/apiUrl';
 import EmailModal from './EmailModal';
+import { useLang } from '../utils/useLang';
 
 const translations = {
     en: {
@@ -78,10 +79,7 @@ interface Topic {
 
 const DecisionRadar = () => {
     const navigate = useNavigate();
-    const [lang, setLang] = useState<'en' | 'fr'>(() => {
-        const saved = localStorage.getItem('strap_lang');
-        return (saved === 'fr' ? 'fr' : 'en');
-    });
+    const [lang] = useLang();
 
     // Auth guard: require login
     useEffect(() => {
@@ -91,10 +89,6 @@ const DecisionRadar = () => {
         }
     }, [navigate]);
 
-    const switchLang = (l: 'en' | 'fr') => {
-        setLang(l);
-        localStorage.setItem('strap_lang', l);
-    };
     const t = translations[lang];
 
     const [topics, setTopics] = useState<Topic[]>([
@@ -240,30 +234,6 @@ const DecisionRadar = () => {
 
     return (
         <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-indigo-500/20 pb-20">
-            {/* Header / Nav */}
-            <nav className="flex items-center justify-between px-8 py-5 border-b border-slate-200 bg-white/80 backdrop-blur-md sticky top-0 z-50">
-                <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors font-medium">
-                    <ArrowLeft size={18} /> {lang === 'en' ? 'Back' : 'Retour'}
-                </button>
-                <div className="flex items-center gap-2">
-                    <Navigation className="text-slate-700" size={24} />
-                    <span className="text-xl font-bold tracking-tight text-slate-900">{t.title}</span>
-                </div>
-                <div className="flex bg-slate-100 rounded-lg p-1">
-                    <button 
-                        onClick={() => switchLang('en')} 
-                        className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${lang === 'en' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500'}`}
-                    >
-                        EN
-                    </button>
-                    <button 
-                        onClick={() => switchLang('fr')} 
-                        className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${lang === 'fr' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500'}`}
-                    >
-                        FR
-                    </button>
-                </div>
-            </nav>
 
             {/* Main Content */}
             <main className="max-w-4xl mx-auto mt-10 px-6">

@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import ProfileModal from './ProfileModal';
+import { logout as endSession } from '../utils/apiClient';
 
 const T = {
     en: {
         navHome: 'Home',
         navService: 'Service',
+        navSoftware: 'STRAP Software',
         navUseCases: 'Use Cases',
         navContact: 'Contact',
         hi: 'Hi',
@@ -14,10 +16,12 @@ const T = {
         logIn: 'Log in',
         signUp: 'Sign up',
         admin: 'Admin',
+        tools: 'StrAP Tools',
     },
     fr: {
         navHome: 'Accueil',
         navService: 'Services',
+        navSoftware: 'STRAP Software',
         navUseCases: 'Cas d’usage',
         navContact: 'Contact',
         hi: 'Bonjour',
@@ -25,6 +29,7 @@ const T = {
         logIn: 'Connexion',
         signUp: 'S’inscrire',
         admin: 'Admin',
+        tools: 'StrAP Tools',
     }
 };
 
@@ -49,7 +54,7 @@ export default function LandingPageNav({ lang, onLangChange }: { lang: 'en' | 'f
     }, []);
 
     const logout = () => {
-        localStorage.removeItem('proextract_user');
+        endSession('user');
         setUser(null);
     };
 
@@ -86,6 +91,7 @@ export default function LandingPageNav({ lang, onLangChange }: { lang: 'en' | 'f
                         {[
                             { label: t.navHome, href: '/' },
                             { label: t.navService, href: '/#tools' },
+                            { label: t.navSoftware, href: '/strap-software/maintenance' },
                             { label: t.navUseCases, href: '/use-cases' },
                             { label: t.navContact, href: '/contact' },
                         ].map(({ label, href }) => (
@@ -109,6 +115,10 @@ export default function LandingPageNav({ lang, onLangChange }: { lang: 'en' | 'f
                                     <button onClick={() => setIsProfileOpen(true)}
                                         className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors px-3 py-1.5 rounded-lg hover:bg-slate-100">
                                         {t.hi}, {user.first_name}
+                                    </button>
+                                    <button onClick={() => navigate('/dashboard')}
+                                        className="text-sm font-medium px-4 py-2 rounded-lg bg-[#FF6B00] text-white hover:bg-[#E66000] transition-all">
+                                        {t.tools}
                                     </button>
                                     {(user.role === 'admin' || user.role === 'super_admin') && (
                                         <button onClick={() => navigate('/admin')}
@@ -169,6 +179,7 @@ export default function LandingPageNav({ lang, onLangChange }: { lang: 'en' | 'f
                             {[
                                 { label: t.navHome, href: '/' },
                                 { label: t.navService, href: '/#tools' },
+                                { label: t.navSoftware, href: '/strap-software/maintenance' },
                                 { label: t.navUseCases, href: '/use-cases' },
                                 { label: t.navContact, href: '/contact' },
                             ].map(({ label, href }) => (
@@ -183,6 +194,10 @@ export default function LandingPageNav({ lang, onLangChange }: { lang: 'en' | 'f
                                     <button onClick={() => { setIsProfileOpen(true); setIsMobileMenuOpen(false); }}
                                         className="text-base font-medium text-slate-700 px-3 py-2.5 rounded-lg hover:bg-slate-100 text-left">
                                         {t.hi}, {user.first_name}
+                                    </button>
+                                    <button onClick={() => { navigate('/dashboard'); setIsMobileMenuOpen(false); }}
+                                        className="mt-2 w-full py-3 rounded-xl bg-[#FF6B00] text-white font-semibold hover:bg-[#E66000] transition-all text-center">
+                                        {t.tools}
                                     </button>
                                     <button onClick={() => { logout(); setIsMobileMenuOpen(false); }}
                                         className="mt-2 w-full py-3 rounded-xl border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50 transition-all text-center">

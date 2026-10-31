@@ -1,11 +1,12 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 import schemas
 from email_utils import send_contact_email
 from dependencies import openai_client, logger
+from security import rate_limit
 
 router = APIRouter(tags=["Contact"])
 
-@router.post("/api/contact")
+@router.post("/api/contact", dependencies=[Depends(rate_limit("contact", 5, 3600))])
 async def handle_contact_form(payload: schemas.ContactFormRequest):
     """
     Receives contact form submissions, uses OpenAI to generate a subject line based on the message,
