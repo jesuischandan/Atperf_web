@@ -207,9 +207,6 @@ const Strapilot = () => {
             
             const upRes = await fetch(`${API_URL}/api/strapilot/upload`, {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${user?.user_id}`
-                },
                 body: formData
             });
             
@@ -223,9 +220,6 @@ const Strapilot = () => {
             
             const analyzeRes = await fetch(`${API_URL}/api/strapilot/${session.id}/analyze-columns?language=${lang}`, {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${user?.user_id}`
-                }
             });
             
             if (!analyzeRes.ok) throw new Error("Column analysis failed");
@@ -254,7 +248,6 @@ const Strapilot = () => {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${user?.user_id}`
                 },
                 body: JSON.stringify({ columns })
             });
@@ -265,7 +258,6 @@ const Strapilot = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${user?.user_id}`
                 },
                 body: JSON.stringify({ 
                     language: lang,

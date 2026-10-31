@@ -13,7 +13,7 @@ Sources: Rachid's emails (Oct 2026), `ATPERF_Brief_Site_Web_STRAP_Software_Maint
 | 4 | Dedicated page | Yes: "Solutions digitales → STRAP Software → Maintenance" |
 | 5 | "Contexte aggravant" criterion | Manual entry in V1 |
 | 6 | Real SAP PM export headers | Not available yet — import mapping stays generic |
-| 7 | Server-side auth / CORS | Fix first, before any real data (Phase 0) |
+| 7 | Server-side auth / CORS | Done first, before any real data (Phase 0) |
 | 8 | Content approval (FR + EN) | Rachid |
 
 ## Phase 1 — Public presence + simulator ✅ (this branch)
@@ -43,14 +43,20 @@ Sources: Rachid's emails (Oct 2026), `ATPERF_Brief_Site_Web_STRAP_Software_Maint
 
 Open point for Rachid: final wording review FR + EN on the three new screens.
 
-## Phase 0 — Security prerequisite (next, 2–3 days)
+## Phase 0 — Security prerequisite ✅
 
-- Signed session token (JWT in httpOnly cookie) issued at user and staff login.
-- `get_current_user` / `require_staff` / `require_admin` FastAPI dependencies on every
-  admin, users, staff, companies and use-case write endpoint.
-- CORS restricted to `atperf.com` (+ localhost in dev).
-- Rate limiting on login, registration, OTP, contact and comments.
-- Frontend sends credentials; role checks stop relying on `localStorage`.
+- Signed JWT sessions in httpOnly cookies (`atperf_user`, `atperf_staff`), logout endpoints,
+  `/me` and `/staff/me`; accounts re-checked on every request (`backend/security.py`).
+- Server-side checks on every non-public endpoint: own data only for users; Admin panel =
+  staff or external admin; user/staff management = admin; deletion and `super_admin` grants =
+  super admin; tool histories and AI calls bound to the session user, never the request body.
+- StrAPilot's old `Authorization: Bearer <user_id>` scheme removed.
+- CORS restricted to the site origins (`CORS_ORIGINS`).
+- Rate limiting on login, OTP, registration, password reset, contact, comments, likes, AI and
+  report e-mails; media uploads limited to images, videos and PDF.
+- Database credentials removed from the code (env only).
+- 38 backend tests (`backend/tests`) + end-to-end browser check of login, dashboard, logout,
+  expired-session redirect and Admin panel.
 
 ## Phase 2 — Shared StrAP tools sidebar (2–3 days)
 
@@ -106,12 +112,12 @@ Out of scope V1: real-time SAP, automatic WO creation, LCC economics.
 | Work | Days | Status |
 |---|---|---|
 | 1. Discover section + dedicated page + simulator | 4–5 | ✅ done |
-| 0. Auth / CORS / rate limiting | 2–3 | next |
-| 2. Sidebar + route migration | 2–3 | |
+| 0. Auth / CORS / rate limiting | 2–3 | ✅ done |
+| 2. Sidebar + route migration | 2–3 | next |
 | 3. Data model + import + mapping | 3–4 | |
 | 3. Scoring + links engines | 3–4 | |
 | 3. Replay / backtest | 2–3 | |
 | 3. Cockpit UI (reusing simulator components) | 4–5 | |
 | 3. Expert validation + audit log | 2 | |
 | Tests, translations, QA, deployment | 2–3 | |
-| **Remaining** | **≈ 20–27 days** | |
+| **Remaining** | **≈ 18–24 days** | |

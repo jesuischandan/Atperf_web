@@ -8,6 +8,7 @@ import html2canvas from 'html2canvas';
 
 import API_URL from '../utils/apiUrl';
 import { generateRadarPDF, generateStrapDiagPDF, generateStrapAnalysisPDF, generateStrapilotPDF } from '../utils/pdfGenerator';
+import { logout as endSession } from '../utils/apiClient';
 
 interface RadarTopic {
     id: string;
@@ -261,7 +262,7 @@ export default function Dashboard() {
                             )}
                             <button
                                 onClick={() => {
-                                    localStorage.removeItem('proextract_user');
+                                    endSession('user');
                                     setUser(null);
                                     navigate('/');
                                 }}

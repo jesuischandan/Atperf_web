@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 import uuid
@@ -10,10 +10,14 @@ import schemas
 from database import get_gcp_db
 from email_utils import send_otp_email, notify_admins_new_request
 from dependencies import hash_password, verify_password
+from security import (
+    check_rate, clear_session_cookie, client_ip, rate_limit, require_user, set_session_cookie,
+)
 
 router = APIRouter(tags=["Authentication"])
 
-@router.post("/register", response_model=schemas.UserResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/register", response_model=schemas.UserResponse, status_code=status.HTTP_201_CREATED,
+             dependencies=[Depends(rate_limit("register", 5, 3600))])
 def register(user_in: schemas.UserCreate, gcp_db: Session = Depends(get_gcp_db)):
     existing = gcp_db.query(models.ExternalUser).filter(models.ExternalUser.email == user_in.email).first()
     if existing:
@@ -86,7 +90,9 @@ def register(user_in: schemas.UserCreate, gcp_db: Session = Depends(get_gcp_db))
 
 
 @router.post("/verify-otp")
-def verify_otp(payload: schemas.OTPVerify, gcp_db: Session = Depends(get_gcp_db)):
+def verify_otp(payload: schemas.OTPVerify, request: Request, gcp_db: Session = Depends(get_gcp_db)):
+    check_rate(f"otp-ip:{client_ip(request)}", 10, 900)
+    check_rate(f"otp-email:{payload.email.lower()}", 5, 900)
     verification = gcp_db.query(models.EmailVerification).filter(models.EmailVerification.email == payload.email).first()
     if not verification:
         raise HTTPException(status_code=400, detail="OTP not found or already verified.")
@@ -143,7 +149,9 @@ def verify_otp(payload: schemas.OTPVerify, gcp_db: Session = Depends(get_gcp_db)
 
 
 @router.post("/login", response_model=schemas.UserResponse)
-def login(login_in: schemas.UserLogin, gcp_db: Session = Depends(get_gcp_db)):
+def login(login_in: schemas.UserLogin, request: Request, response: Response, gcp_db: Session = Depends(get_gcp_db)):
+    check_rate(f"login-ip:{client_ip(request)}", 20, 900)
+    check_rate(f"login-email:{login_in.email.lower()}", 10, 900)
     user = gcp_db.query(models.ExternalUser).filter(models.ExternalUser.email == login_in.email).first()
     if user is None or not verify_password(login_in.password, user.password_hash):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password.")
@@ -162,10 +170,25 @@ def login(login_in: schemas.UserLogin, gcp_db: Session = Depends(get_gcp_db)):
     if company:
         user_dict["company_name"] = company.company_name
 
+    set_session_cookie(response, request, "user", user.user_id)
     return user_dict
 
 
-@router.post("/api/auth/forgot-password/send-otp")
+@router.post("/logout", status_code=204)
+def logout(response: Response):
+    clear_session_cookie(response, "user")
+
+
+@router.get("/me", response_model=schemas.UserResponse)
+def me(user: models.ExternalUser = Depends(require_user), gcp_db: Session = Depends(get_gcp_db)):
+    company = gcp_db.query(models.GCPCompany).filter(models.GCPCompany.company_id == user.company_id).first()
+    user_dict = {c.name: getattr(user, c.name) for c in user.__table__.columns}
+    if company:
+        user_dict["company_name"] = company.company_name
+    return user_dict
+
+
+@router.post("/api/auth/forgot-password/send-otp", dependencies=[Depends(rate_limit("forgot-send", 5, 3600))])
 def forgot_password_send_otp(payload: schemas.ForgotPasswordRequest, gcp_db: Session = Depends(get_gcp_db)):
     # Check if email exists in external or internal users
     ext_user = gcp_db.query(models.ExternalUser).filter(models.ExternalUser.email == payload.email).first()
@@ -190,7 +213,9 @@ def forgot_password_send_otp(payload: schemas.ForgotPasswordRequest, gcp_db: Ses
 
 
 @router.post("/api/auth/forgot-password/reset")
-def forgot_password_reset(payload: schemas.PasswordResetRequest, gcp_db: Session = Depends(get_gcp_db)):
+def forgot_password_reset(payload: schemas.PasswordResetRequest, request: Request, gcp_db: Session = Depends(get_gcp_db)):
+    check_rate(f"otp-ip:{client_ip(request)}", 10, 900)
+    check_rate(f"otp-email:{payload.email.lower()}", 5, 900)
     verification = gcp_db.query(models.EmailVerification).filter(models.EmailVerification.email == payload.email).first()
     if not verification:
         raise HTTPException(status_code=400, detail="OTP not found or already used.")

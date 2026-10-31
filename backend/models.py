@@ -20,7 +20,7 @@ class InternalUser(GCPBase):
         Enum('super_admin', 'developer', 'admin', 'collaborator', 'member'),
         default='member'
     )
-    permission        = Column(LONGTEXT,     nullable=True)
+    permission        = Column(Text().with_variant(LONGTEXT, "mysql"), nullable=True)
     mfa_enabled       = Column(SmallInteger, default=0)
     mfa_secret        = Column(String(255),  nullable=True)
     is_email_verified = Column(SmallInteger, default=0)

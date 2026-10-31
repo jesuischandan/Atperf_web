@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import ProfileModal from './ProfileModal';
+import { logout as endSession } from '../utils/apiClient';
 
 const T = {
     en: {
@@ -51,7 +52,7 @@ export default function LandingPageNav({ lang, onLangChange }: { lang: 'en' | 'f
     }, []);
 
     const logout = () => {
-        localStorage.removeItem('proextract_user');
+        endSession('user');
         setUser(null);
     };
 

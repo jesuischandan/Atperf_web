@@ -6,11 +6,20 @@ from pydantic import BaseModel
 import models
 import schemas
 from database import get_gcp_db
+from security import Principal, get_principal, require_admin_panel
+
+
+def _require_self_or(principal: Principal, user_id: str, allowed: bool) -> None:
+    if principal.user is None and principal.staff is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated. Please log in.")
+    if not allowed and (principal.user is None or principal.user.user_id != user_id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You do not have permission to do this.")
+
 
 router = APIRouter(tags=["Users"])
 
 @router.get("/users", response_model=List[schemas.UserResponse])
-def list_users(gcp_db: Session = Depends(get_gcp_db)):
+def list_users(gcp_db: Session = Depends(get_gcp_db), _: Principal = Depends(require_admin_panel)):
     """List all external users."""
     users = gcp_db.query(models.ExternalUser).order_by(models.ExternalUser.created_at.desc()).all()
     # To keep list fast without N+1 queries ideally we'd join, but this is fine for now
@@ -24,7 +33,8 @@ def list_users(gcp_db: Session = Depends(get_gcp_db)):
 
 
 @router.get("/users/{user_id}", response_model=schemas.UserResponse)
-def get_user(user_id: str, gcp_db: Session = Depends(get_gcp_db)):
+def get_user(user_id: str, gcp_db: Session = Depends(get_gcp_db), principal: Principal = Depends(get_principal)):
+    _require_self_or(principal, user_id, principal.can_open_admin_panel)
     user = gcp_db.query(models.ExternalUser).filter(models.ExternalUser.user_id == user_id).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
@@ -46,7 +56,12 @@ class UserUpdatePayload(BaseModel):
 
 
 @router.patch("/users/{user_id}", response_model=schemas.UserResponse)
-def update_user(user_id: str, payload: UserUpdatePayload, gcp_db: Session = Depends(get_gcp_db)):
+def update_user(user_id: str, payload: UserUpdatePayload, gcp_db: Session = Depends(get_gcp_db),
+                principal: Principal = Depends(get_principal)):
+    _require_self_or(principal, user_id, principal.is_admin)
+    # Account owners may edit their identity; role, status, plan and credits are admin-only.
+    if not principal.is_admin and any(v is not None for v in (payload.role, payload.status, payload.plan_type, payload.credit_balance)):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only administrators can change role, status, plan or credits.")
     user = gcp_db.query(models.ExternalUser).filter(models.ExternalUser.user_id == user_id).first()
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
@@ -64,6 +79,8 @@ def update_user(user_id: str, payload: UserUpdatePayload, gcp_db: Session = Depe
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email is already in use.")
         user.email = payload.email
     if payload.role is not None:
+        if (payload.role == "super_admin" or user.role == "super_admin") and payload.role != user.role and not principal.is_super_admin:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only a super admin can grant or remove the super admin role.")
         user.role = payload.role
     if payload.status is not None:
         user.status = payload.status
@@ -83,8 +100,9 @@ def update_user(user_id: str, payload: UserUpdatePayload, gcp_db: Session = Depe
 
 
 @router.delete("/users/{user_id}", status_code=204)
-def delete_user(user_id: str, gcp_db: Session = Depends(get_gcp_db)):
-    """Delete an external user account."""
+def delete_user(user_id: str, gcp_db: Session = Depends(get_gcp_db), principal: Principal = Depends(get_principal)):
+    """Delete an external user account (the owner, or a super admin)."""
+    _require_self_or(principal, user_id, principal.is_super_admin)
     user = gcp_db.query(models.ExternalUser).filter(models.ExternalUser.user_id == user_id).first()
     if user is None:
         raise HTTPException(status_code=404, detail="User not found.")

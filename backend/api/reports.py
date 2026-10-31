@@ -1,11 +1,14 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 import schemas
 from email_utils import send_pdf_report_email
 from dependencies import openai_client, logger
+from security import rate_limit, require_user
 
 router = APIRouter(tags=["Reports"])
 
-@router.post("/api/reports/email/preview", response_model=schemas.EmailPreviewResponse)
+# Both endpoints send AI requests or e-mails to arbitrary addresses: logged-in users only, rate limited.
+@router.post("/api/reports/email/preview", response_model=schemas.EmailPreviewResponse,
+             dependencies=[Depends(require_user), Depends(rate_limit("ai", 60, 3600))])
 async def preview_report_email(payload: schemas.EmailPreviewRequest):
     """
     Generates an email subject and body using OpenAI based on the report type and language.
@@ -61,7 +64,8 @@ Keep the middle text extremely brief and professional.
         logger.error(f"OpenAI error during email preview generation: {e}")
         return {"subject": default_subject, "body": default_body}
 
-@router.post("/api/reports/email", response_model=schemas.EmailReportResponse)
+@router.post("/api/reports/email", response_model=schemas.EmailReportResponse,
+             dependencies=[Depends(require_user), Depends(rate_limit("report-email", 20, 3600))])
 async def send_report_email(payload: schemas.EmailReportRequest):
     """
     Sends a PDF report to requested email addresses using the frontend-provided body verbatim.

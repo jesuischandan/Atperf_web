@@ -15,7 +15,7 @@ from sqlalchemy import desc
 from openai import OpenAI
 
 from database import get_gcp_db
-from fastapi import Header
+from security import rate_limit, require_user
 import models
 import schemas
 from prompts.StrAPilot import build_columns_prompt, build_kpi_prompt
@@ -27,17 +27,12 @@ client = OpenAI()
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-def get_current_user(authorization: str = Header(None), db: Session = Depends(get_gcp_db)):
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Unauthorized")
-    user_id = authorization.split(" ")[1]
-    user = db.query(models.ExternalUser).filter(models.ExternalUser.user_id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid user")
-    return user
+# Authenticated through the session cookie (previously a Bearer header carrying the raw user_id).
+get_current_user = require_user
 
 
-@router.post("/upload", response_model=schemas.StrapilotSessionResponse)
+@router.post("/upload", response_model=schemas.StrapilotSessionResponse,
+             dependencies=[Depends(rate_limit("ai", 60, 3600))])
 async def upload_data(
     file: UploadFile = File(...),
     description: str = Form(...),
@@ -75,7 +70,8 @@ async def upload_data(
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/{session_id}/analyze-columns", response_model=schemas.AnalyzedColumnsResponse)
+@router.post("/{session_id}/analyze-columns", response_model=schemas.AnalyzedColumnsResponse,
+             dependencies=[Depends(rate_limit("ai", 60, 3600))])
 async def analyze_columns(
     session_id: str,
     language: str = "en",
@@ -150,7 +146,8 @@ async def save_columns(
     db.refresh(session)
     return session
 
-@router.post("/{session_id}/generate-dashboard", response_model=schemas.StrapilotDashboardResponse)
+@router.post("/{session_id}/generate-dashboard", response_model=schemas.StrapilotDashboardResponse,
+             dependencies=[Depends(rate_limit("ai", 60, 3600))])
 async def generate_dashboard(
     session_id: str,
     payload: schemas.GenerateDashboardRequest,
@@ -281,7 +278,8 @@ The JSON must have the following keys:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Dashboard generation failed: {str(e)}")
 
-@router.post("/{session_id}/generate-strap-analysis", response_model=schemas.StrapAnalysisResponse)
+@router.post("/{session_id}/generate-strap-analysis", response_model=schemas.StrapAnalysisResponse,
+             dependencies=[Depends(rate_limit("ai", 60, 3600))])
 async def generate_strap_analysis(
     session_id: str,
     payload: schemas.GenerateStrapAnalysisRequest,
@@ -386,16 +384,17 @@ async def generate_strap_analysis(
 
 @router.get("/history", response_model=List[schemas.StrapilotSessionResponse])
 async def get_history(
-    user_id: str,
-    db: Session = Depends(get_gcp_db)
+    user_id: str | None = None,
+    db: Session = Depends(get_gcp_db),
+    current_user: models.ExternalUser = Depends(require_user),
 ):
     """
-    Get user history
+    Get the logged-in user's history
     """
-    user = db.query(models.ExternalUser).filter(models.ExternalUser.user_id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid user")
-        
+    if user_id and user_id != current_user.user_id:
+        raise HTTPException(status_code=403, detail="You can only view your own history.")
+    user_id = current_user.user_id
+
     sessions = db.query(models.StrapilotSession).filter(
         models.StrapilotSession.user_id == user_id
     ).order_by(desc(models.StrapilotSession.created_at)).all()

@@ -61,21 +61,13 @@ source .venv/bin/activate        # macOS/Linux
 pip install -r requirements.txt
 ```
 
-Create a `.env` file inside `backend/`:
+Create `backend/.env` from the template and fill it in:
 
-```env
-# Database
-DATABASE_URL=postgresql://user:password@host:port/dbname
-
-# OpenAI
-OPENAI_API_KEY=sk-your_openai_api_key
-
-# Email (OTP & PDF delivery)
-SMTP_SERVER=smtp.gmail.com
-SMTP_PORT=465
-SMTP_USERNAME=your_email@gmail.com
-SMTP_PASSWORD=your_gmail_app_password
+```bash
+cp .env.example .env
 ```
+
+Required: the `GCP_DB_*` database settings (the API refuses to start without them) and, in production, a long random `JWT_SECRET` used to sign session cookies. See `backend/.env.example` for every setting (CORS origins, OpenAI, e-mail).
 
 Start the API server:
 
@@ -86,6 +78,20 @@ uvicorn main:app --reload --host 0.0.0.0 --port 35001
 API docs available at: `http://localhost:35001/docs`
 
 ---
+
+Run the backend tests (they use a throw-away SQLite database, no MySQL needed):
+
+```bash
+pip install -r requirements-dev.txt
+pytest tests
+```
+
+### 🔐 Authentication model
+
+- Logging in (`/login`, `/staff/login`) sets a signed, httpOnly session cookie (`atperf_user` / `atperf_staff`); `/logout` and `/staff/logout` clear it. The account is re-checked on every request, so suspensions and role changes apply immediately.
+- Every non-public endpoint checks the session on the server (`backend/security.py`): users only reach their own data; the Admin panel endpoints require staff or an external admin; managing users and staff requires an admin; deleting accounts and granting `super_admin` require a super admin.
+- Login, OTP, registration, contact, comments and AI endpoints are rate limited per IP (in memory, per process).
+- The frontend sends cookies automatically through `frontend/src/utils/apiClient.ts`, which wraps `fetch` for calls to the API and sends visitors back to the login page when their session has expired.
 
 ### 2. Frontend Setup (React + Vite)
 
@@ -165,8 +171,10 @@ Atperf_web/
 
 | Issue | Fix |
 |---|---|
-| **CORS errors on login** | Ensure `VITE_API_URL` exactly matches the backend host (e.g. `127.0.0.1` vs `localhost`) |
+| **CORS errors on login** | Add the frontend origin to `CORS_ORIGINS` in `backend/.env` (e.g. `127.0.0.1` vs `localhost`) |
 | **DB connection refused** | Verify PostgreSQL is running and `DATABASE_URL` is correct in `backend/.env` |
 | **"Failed to generate diagnostic"** | Check that your OpenAI API key is valid and has not hit rate limits |
 | **PDF export missing chart** | Keep the browser tab active and fully loaded before clicking export — `html2canvas` requires a visible DOM |
-| **OTP email not received** | Confirm `SMTP_PASSWORD` is a Gmail App Password, not your account password |
+| **OTP email not received** | Confirm `MAIL_PASSWORD` is a Gmail App Password, not your account password |
+| **Logged out after every restart** | Set a fixed `JWT_SECRET` in `backend/.env` |
+| **\"Too many requests\" (429)** | Rate limit hit — wait 15–60 minutes, or restart the API in development |

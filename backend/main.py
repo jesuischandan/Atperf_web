@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import models
@@ -20,11 +22,19 @@ models.GCPBase.metadata.create_all(bind=gcp_engine)
 
 app = FastAPI(title="Atperf API")
 
+# Only the site itself (and the local dev server) may call the API with credentials.
+CORS_ORIGINS = [
+    o.strip() for o in os.getenv(
+        "CORS_ORIGINS",
+        "https://atperf.com,https://www.atperf.com,http://localhost:35000,http://127.0.0.1:35000",
+    ).split(",") if o.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r".*",        # accept any origin (public IP, domain, localhost …)
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 

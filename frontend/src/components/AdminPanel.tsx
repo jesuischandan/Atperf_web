@@ -5,6 +5,7 @@ import { ArrowLeft, Zap, Loader2, X, Users, Shield, Trash2, FileText } from 'luc
 import API_URL from '../utils/apiUrl';
 import AdminUseCases from './AdminUseCases';
 import AdminGallery from './AdminGallery';
+import { logout as endSession } from '../utils/apiClient';
 
 const translations = {
     en: {
@@ -441,8 +442,7 @@ export default function AdminPanel() {
                 <div>
                     <button
                         onClick={() => {
-                            localStorage.removeItem('proextract_user');
-                            localStorage.removeItem('proextract_staff');
+                            endSession('all');
                             navigate('/staff/login');
                         }}
                         className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
