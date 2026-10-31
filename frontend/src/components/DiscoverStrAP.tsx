@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowRight, AlertTriangle, Lightbulb, TrendingUp, Zap, ChevronRight } from 'lucide-react';
 import LandingPageNav from './LandingPageNav';
 import Footer from './Footer';
+import StrapMaintenanceSection from './maintenance/StrapMaintenanceSection';
 
 /* ─────────────────────────────────────────────────────────────
    Translations
@@ -497,6 +498,11 @@ export default function DiscoverStrAP() {
                     </FadeIn>
                 </div>
             </section>
+
+            {/* ══════════════════════════════════════════════════════════
+                STRAP MAINTENANCE — next industrial application
+            ══════════════════════════════════════════════════════════ */}
+            <StrapMaintenanceSection lang={lang} />
 
             {/* ══════════════════════════════════════════════════════════
                 OFFERS

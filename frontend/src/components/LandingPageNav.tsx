@@ -7,6 +7,7 @@ const T = {
     en: {
         navHome: 'Home',
         navService: 'Service',
+        navSoftware: 'STRAP Software',
         navUseCases: 'Use Cases',
         navContact: 'Contact',
         hi: 'Hi',
@@ -18,6 +19,7 @@ const T = {
     fr: {
         navHome: 'Accueil',
         navService: 'Services',
+        navSoftware: 'STRAP Software',
         navUseCases: 'Cas d’usage',
         navContact: 'Contact',
         hi: 'Bonjour',
@@ -86,6 +88,7 @@ export default function LandingPageNav({ lang, onLangChange }: { lang: 'en' | 'f
                         {[
                             { label: t.navHome, href: '/' },
                             { label: t.navService, href: '/#tools' },
+                            { label: t.navSoftware, href: '/strap-software/maintenance' },
                             { label: t.navUseCases, href: '/use-cases' },
                             { label: t.navContact, href: '/contact' },
                         ].map(({ label, href }) => (
@@ -169,6 +172,7 @@ export default function LandingPageNav({ lang, onLangChange }: { lang: 'en' | 'f
                             {[
                                 { label: t.navHome, href: '/' },
                                 { label: t.navService, href: '/#tools' },
+                                { label: t.navSoftware, href: '/strap-software/maintenance' },
                                 { label: t.navUseCases, href: '/use-cases' },
                                 { label: t.navContact, href: '/contact' },
                             ].map(({ label, href }) => (

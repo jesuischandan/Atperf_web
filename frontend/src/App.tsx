@@ -18,6 +18,8 @@ import UseCaseDetailPage from './components/UseCaseDetailPage';
 import TermsPage from './components/TermsPage';
 import PrivacyPage from './components/PrivacyPage';
 import DiscoverStrAP from './components/DiscoverStrAP';
+import StrapSoftwareMaintenancePage from './components/maintenance/StrapSoftwareMaintenancePage';
+import StrapMaintenanceDemo from './components/maintenance/StrapMaintenanceDemo';
 
 function App() {
     return (
@@ -42,6 +44,9 @@ function App() {
                 <Route path="/terms" element={<TermsPage />} />
                 <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/discover" element={<DiscoverStrAP />} />
+                <Route path="/strap-software" element={<Navigate to="/strap-software/maintenance" replace />} />
+                <Route path="/strap-software/maintenance" element={<StrapSoftwareMaintenancePage />} />
+                <Route path="/strap-software/maintenance/demo" element={<StrapMaintenanceDemo />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
         </BrowserRouter>
