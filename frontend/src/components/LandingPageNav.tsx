@@ -16,6 +16,7 @@ const T = {
         logIn: 'Log in',
         signUp: 'Sign up',
         admin: 'Admin',
+        tools: 'StrAP Tools',
     },
     fr: {
         navHome: 'Accueil',
@@ -28,6 +29,7 @@ const T = {
         logIn: 'Connexion',
         signUp: 'S’inscrire',
         admin: 'Admin',
+        tools: 'StrAP Tools',
     }
 };
 
@@ -114,6 +116,10 @@ export default function LandingPageNav({ lang, onLangChange }: { lang: 'en' | 'f
                                         className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors px-3 py-1.5 rounded-lg hover:bg-slate-100">
                                         {t.hi}, {user.first_name}
                                     </button>
+                                    <button onClick={() => navigate('/dashboard')}
+                                        className="text-sm font-medium px-4 py-2 rounded-lg bg-[#FF6B00] text-white hover:bg-[#E66000] transition-all">
+                                        {t.tools}
+                                    </button>
                                     {(user.role === 'admin' || user.role === 'super_admin') && (
                                         <button onClick={() => navigate('/admin')}
                                             className="text-sm font-medium px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition-all">
@@ -188,6 +194,10 @@ export default function LandingPageNav({ lang, onLangChange }: { lang: 'en' | 'f
                                     <button onClick={() => { setIsProfileOpen(true); setIsMobileMenuOpen(false); }}
                                         className="text-base font-medium text-slate-700 px-3 py-2.5 rounded-lg hover:bg-slate-100 text-left">
                                         {t.hi}, {user.first_name}
+                                    </button>
+                                    <button onClick={() => { navigate('/dashboard'); setIsMobileMenuOpen(false); }}
+                                        className="mt-2 w-full py-3 rounded-xl bg-[#FF6B00] text-white font-semibold hover:bg-[#E66000] transition-all text-center">
+                                        {t.tools}
                                     </button>
                                     <button onClick={() => { logout(); setIsMobileMenuOpen(false); }}
                                         className="mt-2 w-full py-3 rounded-xl border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50 transition-all text-center">

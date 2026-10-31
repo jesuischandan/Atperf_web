@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Zap, AlertCircle, Loader2, LayoutDashboard, Navigation, Download, Mail, Activity, TrendingDown, Brain, BarChart3, Target, AlertTriangle, ShieldAlert, Flag } from 'lucide-react';
-import ProfileModal from './ProfileModal';
+import { Plus, Zap, AlertCircle, Loader2, LayoutDashboard, Navigation, Download, Mail, Activity, TrendingDown, Brain, BarChart3, Target, AlertTriangle, ShieldAlert, Flag } from 'lucide-react';
 import EmailModal, { type ReportType } from './EmailModal';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip as RechartsTooltip, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import html2canvas from 'html2canvas';
 
 import API_URL from '../utils/apiUrl';
 import { generateRadarPDF, generateStrapDiagPDF, generateStrapAnalysisPDF, generateStrapilotPDF } from '../utils/pdfGenerator';
-import { logout as endSession } from '../utils/apiClient';
 
 interface RadarTopic {
     id: string;
@@ -62,7 +60,6 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [user, setUser] = useState<{ user_id?: string, first_name?: string, last_name?: string, email?: string, role?: string, status?: string, company_id?: string } | null>(null);
-    const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
     const [exportLoading, setExportLoading] = useState(false);
     const [emailPdfData, setEmailPdfData] = useState({
@@ -234,58 +231,7 @@ export default function Dashboard() {
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col">
-            {/* Nav */}
-            <nav className="flex items-center justify-between px-8 py-5 bg-white border-b border-slate-200 sticky top-0 z-10">
-                <button onClick={() => navigate('/')} className="flex items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors text-sm font-medium">
-                    <ArrowLeft size={16} /> Home
-                </button>
-                <div className="flex items-center gap-2">
-                    <div className="bg-[#FF6B00] p-1.5 rounded-lg"><Zap size={16} className="fill-white" /></div>
-                    <span className="font-bold text-slate-900 tracking-tight">Welcome to your dashboard</span>
-                </div>
-                <div className="flex items-center gap-3">
-                    {user && (
-                        <>
-                            <button
-                                onClick={() => setIsProfileOpen(true)}
-                                className="text-sm font-medium text-slate-700 hover:text-[#FF6B00] transition-colors hidden sm:inline-block cursor-pointer decoration-orange-200 underline-offset-4 hover:underline"
-                            >
-                                Hi, {user.first_name}
-                            </button>
-                            {(user.role === 'admin' || user.role === 'super_admin') && (
-                                <button
-                                    onClick={() => navigate('/admin')}
-                                    className="bg-slate-800 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-slate-700 transition-all shadow-sm flex items-center gap-1.5"
-                                >
-                                    Admin
-                                </button>
-                            )}
-                            <button
-                                onClick={() => {
-                                    endSession('user');
-                                    setUser(null);
-                                    navigate('/');
-                                }}
-                                className="bg-slate-100 text-slate-600 px-4 py-2 rounded-full text-sm font-semibold hover:bg-slate-200 transition-all shadow-sm hidden sm:inline-flex"
-                            >
-                                Log out
-                            </button>
-                        </>
-                    )}
-                </div>
-            </nav>
 
-            {/* Profile Modal */}
-            {isProfileOpen && user && user.user_id && (
-                <ProfileModal
-                    user={user as any}
-                    onClose={() => setIsProfileOpen(false)}
-                    onUpdate={(updatedUser) => {
-                        setUser(updatedUser);
-                        localStorage.setItem('proextract_user', JSON.stringify(updatedUser));
-                    }}
-                />
-            )}
 
             <main className="flex-1 max-w-6xl w-full mx-auto px-6 py-12">
                 {/* Title */}
@@ -295,10 +241,10 @@ export default function Dashboard() {
                 </div>
 
                 {/* Tabs */}
-                <div className="flex gap-2 mb-8 border-b border-slate-200">
+                <div className="flex gap-2 mb-8 border-b border-slate-200 overflow-x-auto">
                     <button
                         onClick={() => setActiveTab('strap')}
-                        className={`flex items-center gap-2 px-5 py-3 text-sm font-bold transition-all border-b-2 -mb-px ${activeTab === 'strap'
+                        className={`flex items-center gap-2 px-5 py-3 text-sm font-bold whitespace-nowrap transition-all border-b-2 -mb-px ${activeTab === 'strap'
                             ? 'border-[#FF6B00] text-[#FF6B00]'
                             : 'border-transparent text-slate-400 hover:text-slate-600'
                             }`}
@@ -310,7 +256,7 @@ export default function Dashboard() {
                     </button>
                     <button
                         onClick={() => setActiveTab('radar')}
-                        className={`flex items-center gap-2 px-5 py-3 text-sm font-bold transition-all border-b-2 -mb-px ${activeTab === 'radar'
+                        className={`flex items-center gap-2 px-5 py-3 text-sm font-bold whitespace-nowrap transition-all border-b-2 -mb-px ${activeTab === 'radar'
                             ? 'border-[#FF6B00] text-[#FF6B00]'
                             : 'border-transparent text-slate-400 hover:text-slate-600'
                             }`}
@@ -322,7 +268,7 @@ export default function Dashboard() {
                     </button>
                     <button
                         onClick={() => setActiveTab('pilot')}
-                        className={`flex items-center gap-2 px-5 py-3 text-sm font-bold transition-all border-b-2 -mb-px ${activeTab === 'pilot'
+                        className={`flex items-center gap-2 px-5 py-3 text-sm font-bold whitespace-nowrap transition-all border-b-2 -mb-px ${activeTab === 'pilot'
                             ? 'border-[#FF6B00] text-[#FF6B00]'
                             : 'border-transparent text-slate-400 hover:text-slate-600'
                             }`}

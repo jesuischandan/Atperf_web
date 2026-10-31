@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Zap, Loader2, Brain, AlertCircle, Activity, TrendingDown, Download, Mail } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Loader2, Brain, AlertCircle, Activity, TrendingDown, Download, Mail } from 'lucide-react';
 import EmailModal from './EmailModal';
 import { generateStrapDiagPDF } from '../utils/pdfGenerator';
 
@@ -248,16 +248,6 @@ export default function SubmitForm() {
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col">
-            <nav className="flex items-center justify-between px-8 py-5 bg-white border-b border-slate-200">
-                <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors text-sm font-medium">
-                    <ArrowLeft size={16} /> Back
-                </button>
-                <div className="flex items-center gap-2">
-                    <div className="bg-[#FF6B00] p-1.5 rounded-lg"><Zap size={16} className="fill-white" /></div>
-                    <span className="font-bold text-slate-900 tracking-tight">StrAP Diagnostic</span>
-                </div>
-                <button onClick={() => navigate('/dashboard')} className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">Dashboard</button>
-            </nav>
 
             <div className="flex-1 flex items-center justify-center px-4 py-8">
                 <div className="bg-white border border-slate-200 rounded-3xl shadow-xl p-8 max-w-lg w-full">

@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Zap, Loader2, X, Users, Shield, Trash2, FileText } from 'lucide-react';
+import { Zap, Loader2, X, Users, Shield, Trash2, FileText } from 'lucide-react';
 
 import API_URL from '../utils/apiUrl';
 import AdminUseCases from './AdminUseCases';
 import AdminGallery from './AdminGallery';
-import { logout as endSession } from '../utils/apiClient';
+import { useLang } from '../utils/useLang';
 
 const translations = {
     en: {
@@ -187,10 +187,7 @@ export default function AdminPanel() {
     const currentUser = currentUserRaw ? JSON.parse(currentUserRaw) : null;
     const currentStaff = currentStaffRaw ? JSON.parse(currentStaffRaw) : null;
 
-    const [lang] = useState<'en' | 'fr'>(() => {
-        const saved = localStorage.getItem('strap_lang');
-        return (saved === 'fr' ? 'fr' : 'en');
-    });
+    const [lang] = useLang();
     const t = translations[lang];
 
     // Access Control Logic
@@ -431,26 +428,6 @@ export default function AdminPanel() {
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col">
-            <nav className="flex items-center justify-between px-8 py-5 bg-white border-b border-slate-200">
-                <button onClick={() => navigate('/')} className="flex items-center gap-2 text-slate-500 hover:text-slate-900 text-sm font-medium">
-                    <ArrowLeft size={16} /> {t.back}
-                </button>
-                <div className="flex items-center gap-2">
-                    <div className="bg-indigo-600 p-1.5 rounded-lg"><Zap size={16} className="fill-white" /></div>
-                    <span className="font-bold text-slate-900 tracking-tight">{t.title}</span>
-                </div>
-                <div>
-                    <button
-                        onClick={() => {
-                            endSession('all');
-                            navigate('/staff/login');
-                        }}
-                        className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
-                    >
-                        {t.logOut}
-                    </button>
-                </div>
-            </nav>
 
             <main className="flex-1 max-w-6xl w-full mx-auto px-6 py-10">
                 {/* Primary Nav */}
@@ -482,7 +459,7 @@ export default function AdminPanel() {
                 )}
 
                 {primaryTab === 'database' && (
-                    <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl w-fit mb-8">
+                    <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl w-fit max-w-full overflow-x-auto mb-8">
                         <button
                             onClick={() => setTab('external')}
                             className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${tab === 'external' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}

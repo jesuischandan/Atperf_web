@@ -20,24 +20,20 @@ import PrivacyPage from './components/PrivacyPage';
 import DiscoverStrAP from './components/DiscoverStrAP';
 import StrapSoftwareMaintenancePage from './components/maintenance/StrapSoftwareMaintenancePage';
 import StrapMaintenanceDemo from './components/maintenance/StrapMaintenanceDemo';
+import ToolsLayout from './components/layout/ToolsLayout';
 
 function App() {
     return (
         <BrowserRouter>
             <Routes>
                 <Route path="/" element={<LandingPage />} />
-                <Route path="/submit" element={<SubmitForm />} />
-                <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                <Route path="/admin" element={<AdminPanel />} />
                 <Route path="/staff/login" element={<StaffLogin />} />
                 <Route path="/staff/register" element={<StaffRegister />} />
                 <Route path="/tool/strap-diagnosis" element={<StrapDiag />} />
                 <Route path="/tool/decision-radar" element={<DecisionRadarLanding />} />
                 <Route path="/tool/strapilot" element={<StrapilotLanding />} />
-                <Route path="/tool/strapilot/app" element={<Strapilot />} />
-                <Route path="/decision-radar" element={<DecisionRadar />} />
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/use-cases" element={<UseCasesPage />} />
                 <Route path="/use-cases/:id" element={<UseCaseDetailPage />} />
@@ -47,6 +43,15 @@ function App() {
                 <Route path="/strap-software" element={<Navigate to="/strap-software/maintenance" replace />} />
                 <Route path="/strap-software/maintenance" element={<StrapSoftwareMaintenancePage />} />
                 <Route path="/strap-software/maintenance/demo" element={<StrapMaintenanceDemo />} />
+                {/* Logged-in StrAP tools share the sidebar shell */}
+                <Route element={<ToolsLayout />}>
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/submit" element={<SubmitForm />} />
+                    <Route path="/decision-radar" element={<DecisionRadar />} />
+                    <Route path="/tool/strapilot/app" element={<Strapilot />} />
+                    <Route path="/tool/strap-maintenance" element={<StrapMaintenanceDemo embedded />} />
+                    <Route path="/admin" element={<AdminPanel />} />
+                </Route>
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
         </BrowserRouter>

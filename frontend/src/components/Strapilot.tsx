@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bot, ArrowLeft, UploadCloud, Loader2, Sparkles, AlertCircle, BarChart3, ChevronRight, Check, Download, Mail, Zap, Goal, Target, Crosshair, AlertTriangle, Activity, ShieldAlert, Flag } from 'lucide-react';
+import { ArrowLeft, UploadCloud, Loader2, Sparkles, AlertCircle, BarChart3, ChevronRight, Check, Download, Mail, Zap, Goal, Target, Crosshair, AlertTriangle, Activity, ShieldAlert, Flag } from 'lucide-react';
 
 import API_URL from '../utils/apiUrl';
 import { generateStrapAnalysisPDF } from '../utils/pdfGenerator';
 import EmailModal from './EmailModal';
+import { useLang } from '../utils/useLang';
 
 interface ColumnMeta {
     name: string;
@@ -109,10 +110,7 @@ const Strapilot = () => {
     const [sessionId, setSessionId] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [lang] = useState<'en' | 'fr'>(() => {
-        const saved = localStorage.getItem('strap_lang');
-        return (saved === 'fr' ? 'fr' : 'en');
-    });
+    const [lang] = useLang();
 
     const t = TRANSLATIONS[lang];
 
@@ -432,7 +430,7 @@ const Strapilot = () => {
 
     return (
         <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-[#FF6B00]/20 pb-20">
-            <nav className="flex items-center justify-between px-8 py-5 bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+            <div className="max-w-4xl mx-auto px-6 pt-8 w-full flex items-center justify-between">
                 <button onClick={() => {
                     if (step > 1) {
                         setStep((prev) => (prev - 1) as 1 | 2 | 3 | 4);
@@ -442,16 +440,12 @@ const Strapilot = () => {
                 }} className="flex items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors text-sm font-medium">
                     <ArrowLeft size={16} /> {t.back}
                 </button>
-                <div className="flex items-center gap-2">
-                    <div className="bg-[#FF6B00] p-1.5 rounded-lg"><Bot size={16} className="text-white" /></div>
-                    <span className="font-bold text-slate-900 tracking-tight hidden sm:block">StrAPilot</span>
-                </div>
                 <div className="text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
                     {t.stepStr} {step}
                 </div>
-            </nav>
+            </div>
 
-            <main className="max-w-4xl mx-auto px-6 mt-12 w-full">
+            <main className="max-w-4xl mx-auto px-6 mt-6 w-full">
                 {error && (
                     <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-3">
                         <AlertCircle className="text-red-500 shrink-0" />

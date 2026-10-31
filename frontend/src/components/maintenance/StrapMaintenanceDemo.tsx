@@ -1,8 +1,10 @@
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { AlertTriangle, ArrowLeft, CheckCircle2, Info, RotateCcw, SlidersHorizontal, XCircle, PencilLine } from 'lucide-react';
 import LandingPageNav from '../LandingPageNav';
 import Footer from '../Footer';
+import { useLang } from '../../utils/useLang';
+import { STAFF_KEY } from '../../utils/apiClient';
 import FluxTimeline, { TimelineLegend } from './FluxTimeline';
 import {
     CRITERIA, DATA, DEFAULT_THRESHOLDS, DEFAULT_WEIGHTS, breakdown, daysBetween, drivers, equipmentById,
@@ -189,10 +191,13 @@ function ScoreBar({ value, priority }: { value: number; priority: PriorityClass 
     );
 }
 
-export default function StrapMaintenanceDemo() {
+/**
+ * `embedded`: rendered inside the StrAP tools sidebar (staff, later pilot clients) instead of
+ * as a public page with the site header and footer.
+ */
+export default function StrapMaintenanceDemo({ embedded = false }: { embedded?: boolean }) {
     const navigate = useNavigate();
-    const [lang, setLang] = useState<Lang>(() => (localStorage.getItem('strap_lang') === 'fr' ? 'fr' : 'en'));
-    const switchLang = (l: Lang) => { setLang(l); localStorage.setItem('strap_lang', l); };
+    const [lang, switchLang] = useLang();
     const t = T[lang];
 
     const [tab, setTab] = useState<Tab>('overview');
@@ -248,15 +253,22 @@ export default function StrapMaintenanceDemo() {
     const allDates = [...DATA.notices.map(n => n.date), ...DATA.workOrders.map(o => o.date)].sort();
     const range = { start: shiftDays(allDates[0], -10), end: shiftDays(allDates[allDates.length - 1], 10) };
 
-    return (
-        <div className="min-h-screen bg-white text-slate-900 antialiased flex flex-col" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
-            <LandingPageNav lang={lang} onLangChange={switchLang} />
+    // Inside the tools shell the module is staff-only for now; everyone else gets the public simulator.
+    if (embedded && !localStorage.getItem(STAFF_KEY)) {
+        return <Navigate to="/strap-software/maintenance/demo" replace />;
+    }
 
-            <main className="flex-1 pt-24 pb-16 px-4 sm:px-6">
+    return (
+        <div className={`${embedded ? '' : 'min-h-screen'} bg-white text-slate-900 antialiased flex flex-col`} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
+            {!embedded && <LandingPageNav lang={lang} onLangChange={switchLang} />}
+
+            <main className={`flex-1 ${embedded ? 'pt-8' : 'pt-24'} pb-16 px-4 sm:px-6`}>
                 <div className="max-w-7xl mx-auto">
-                    <button onClick={() => navigate('/strap-software/maintenance')} className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-[#FF6B00] mb-4">
-                        <ArrowLeft size={15} /> {t.back}
-                    </button>
+                    {!embedded && (
+                        <button onClick={() => navigate('/strap-software/maintenance')} className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-[#FF6B00] mb-4">
+                            <ArrowLeft size={15} /> {t.back}
+                        </button>
+                    )}
                     <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight mb-2">{t.title}</h1>
                     <p className="text-slate-500 text-base sm:text-lg mb-6">{t.subtitle}</p>
 
@@ -545,7 +557,7 @@ export default function StrapMaintenanceDemo() {
                 </div>
             </main>
 
-            <Footer lang={lang} />
+            {!embedded && <Footer lang={lang} />}
         </div>
     );
 }

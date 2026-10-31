@@ -58,16 +58,23 @@ Open point for Rachid: final wording review FR + EN on the three new screens.
 - 38 backend tests (`backend/tests`) + end-to-end browser check of login, dashboard, logout,
   expired-session redirect and Admin panel.
 
-## Phase 2 — Shared StrAP tools sidebar (2–3 days)
+## Phase 2 — Shared StrAP tools sidebar ✅
 
-- `ToolsLayout` with a sidebar for every authenticated tool page via nested routes
-  (`<Route element={<ToolsLayout/>}>` + `<Outlet/>`): Dashboard, StrAP Perf Diagnostic,
-  Decision Radar, StrAPilot, ProExtract, STRAP Maintenance (Cockpit, Import, Replay,
-  Parameters; "Prototype" badge; visible only to staff and enabled pilot clients),
-  then Admin (role-based), language, profile, log out.
-- Collapsible to icons (remembered), drawer on mobile, active state, driven by one config array.
-- Replaces the duplicated top bars in Dashboard, StrapDiag, Strapilot, DecisionRadar, SubmitForm.
-- Public marketing pages keep the public header and footer; old URLs redirect.
+- `components/layout/ToolsLayout.tsx` wraps every logged-in tool page through a nested route
+  (`<Route element={<ToolsLayout/>}>` + `<Outlet/>`): Dashboard, StrAP Perf Diagnostic
+  (`/submit`), Decision Radar, StrAPilot, STRAP Maintenance (`/tool/strap-maintenance`,
+  "Prototype" badge, staff only until the Phase 3 pilot flag), and Admin.
+- Entries come from one config array (`components/layout/toolsNav.ts`).
+- Desktop: fixed sidebar, collapsible to icons (remembered per browser). Mobile: top bar with
+  the current page name and a drawer. Bottom: Admin (staff or external admin), EN/FR switch,
+  profile, log out.
+- One language setting for all tools (`utils/useLang.ts`): the sidebar switch updates the
+  open tool immediately.
+- The duplicated top bars of Dashboard, Diagnostic, Decision Radar, StrAPilot and Admin are
+  removed; StrAPilot keeps its step-back control and step counter in the page.
+- URLs are unchanged, so no redirects were needed. Public landing pages keep the site header;
+  the header gains a "StrAP Tools" button for logged-in users.
+- Fixed horizontal scrolling on phones for the Dashboard tabs and Admin sub-tabs.
 
 ## Phase 3 — STRAP Maintenance prototype (≈ 4 weeks)
 
@@ -113,11 +120,11 @@ Out of scope V1: real-time SAP, automatic WO creation, LCC economics.
 |---|---|---|
 | 1. Discover section + dedicated page + simulator | 4–5 | ✅ done |
 | 0. Auth / CORS / rate limiting | 2–3 | ✅ done |
-| 2. Sidebar + route migration | 2–3 | next |
-| 3. Data model + import + mapping | 3–4 | |
+| 2. Sidebar + route migration | 2–3 | ✅ done |
+| 3. Data model + import + mapping | 3–4 | next |
 | 3. Scoring + links engines | 3–4 | |
 | 3. Replay / backtest | 2–3 | |
 | 3. Cockpit UI (reusing simulator components) | 4–5 | |
 | 3. Expert validation + audit log | 2 | |
 | Tests, translations, QA, deployment | 2–3 | |
-| **Remaining** | **≈ 18–24 days** | |
+| **Remaining** | **≈ 15–21 days** | |
