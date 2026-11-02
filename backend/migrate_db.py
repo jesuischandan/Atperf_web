@@ -26,4 +26,10 @@ with gcp_engine.begin() as conn:
     except Exception as e:
         print(e)
 
+    try:
+        conn.execute(text("ALTER TABLE companies ADD COLUMN maintenance_pilot SMALLINT DEFAULT 0;"))
+        print("Added companies.maintenance_pilot")
+    except Exception as e:
+        print(e)
+
 print("Done")

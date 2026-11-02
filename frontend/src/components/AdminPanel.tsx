@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Zap, Loader2, X, Users, Shield, Trash2, FileText } from 'lucide-react';
+import { Zap, Loader2, X, Users, Shield, Trash2, FileText } from 'lucide-react';
 
 import API_URL from '../utils/apiUrl';
 import AdminUseCases from './AdminUseCases';
 import AdminGallery from './AdminGallery';
+import { useLang } from '../utils/useLang';
 
 const translations = {
     en: {
@@ -52,6 +53,8 @@ const translations = {
         maxUsers: "Max Users",
         billingEmail: "Billing Email",
         joined: "Joined",
+        pilot: "STRAP Maintenance",
+        pilotHint: "Enable the STRAP Maintenance pilot for this company (Atperf staff only)",
         phTaxId: "Tax ID",
         phBillingEmail: "billing@example.com",
         logOut: "Log out",
@@ -103,6 +106,8 @@ const translations = {
         maxUsers: "Max Utilisateurs",
         billingEmail: "Email de facturation",
         joined: "Inscrit",
+        pilot: "STRAP Maintenance",
+        pilotHint: "Activer le pilote STRAP Maintenance pour cette entreprise (équipe Atperf uniquement)",
         phTaxId: "Numéro de TVA",
         phBillingEmail: "facturation@exemple.com",
         logOut: "Déconnexion",
@@ -145,6 +150,7 @@ interface Company {
     company_status: string;
     total_credits: number;
     max_users: number;
+    maintenance_pilot?: number;
     created_at: string;
 }
 
@@ -186,10 +192,7 @@ export default function AdminPanel() {
     const currentUser = currentUserRaw ? JSON.parse(currentUserRaw) : null;
     const currentStaff = currentStaffRaw ? JSON.parse(currentStaffRaw) : null;
 
-    const [lang] = useState<'en' | 'fr'>(() => {
-        const saved = localStorage.getItem('strap_lang');
-        return (saved === 'fr' ? 'fr' : 'en');
-    });
+    const [lang] = useLang();
     const t = translations[lang];
 
     // Access Control Logic
@@ -307,7 +310,8 @@ export default function AdminPanel() {
             o.plan_type !== d.plan_type ||
             o.company_status !== d.company_status ||
             o.total_credits !== d.total_credits ||
-            o.max_users !== d.max_users;
+            o.max_users !== d.max_users ||
+            !!o.maintenance_pilot !== !!d.maintenance_pilot;
     };
 
     const handleCreateCompany = async () => {
@@ -380,7 +384,9 @@ export default function AdminPanel() {
                     plan_type: draft.plan_type,
                     company_status: draft.company_status,
                     total_credits: isNaN(parsedCredits) ? 0 : parsedCredits,
-                    max_users: isNaN(parsedMaxUsers) ? 1 : parsedMaxUsers
+                    max_users: isNaN(parsedMaxUsers) ? 1 : parsedMaxUsers,
+                    // Only staff may change the pilot flag; others send nothing so the server keeps it.
+                    ...(currentStaff ? { maintenance_pilot: draft.maintenance_pilot ? 1 : 0 } : {}),
                 };
                 const res = await fetch(`${API_URL}/companies/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 const data = await res.json();
@@ -430,27 +436,6 @@ export default function AdminPanel() {
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col">
-            <nav className="flex items-center justify-between px-8 py-5 bg-white border-b border-slate-200">
-                <button onClick={() => navigate('/')} className="flex items-center gap-2 text-slate-500 hover:text-slate-900 text-sm font-medium">
-                    <ArrowLeft size={16} /> {t.back}
-                </button>
-                <div className="flex items-center gap-2">
-                    <div className="bg-indigo-600 p-1.5 rounded-lg"><Zap size={16} className="fill-white" /></div>
-                    <span className="font-bold text-slate-900 tracking-tight">{t.title}</span>
-                </div>
-                <div>
-                    <button
-                        onClick={() => {
-                            localStorage.removeItem('proextract_user');
-                            localStorage.removeItem('proextract_staff');
-                            navigate('/staff/login');
-                        }}
-                        className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
-                    >
-                        {t.logOut}
-                    </button>
-                </div>
-            </nav>
 
             <main className="flex-1 max-w-6xl w-full mx-auto px-6 py-10">
                 {/* Primary Nav */}
@@ -482,7 +467,7 @@ export default function AdminPanel() {
                 )}
 
                 {primaryTab === 'database' && (
-                    <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl w-fit mb-8">
+                    <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl w-fit max-w-full overflow-x-auto mb-8">
                         <button
                             onClick={() => setTab('external')}
                             className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${tab === 'external' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
@@ -756,6 +741,7 @@ export default function AdminPanel() {
                                             <th className="px-4 py-2 text-right">{t.maxUsers}</th>
                                             <th className="px-4 py-2 text-left">{t.billingEmail}</th>
                                             <th className="px-4 py-2 text-left">{t.joined}</th>
+                                            <th className="px-4 py-2 text-center whitespace-nowrap">{t.pilot}</th>
                                             <th className="px-4 py-2 text-right">{t.actions}</th>
                                         </tr>
                                     </thead>
@@ -785,7 +771,7 @@ export default function AdminPanel() {
                                                         placeholder={t.phLoc}
                                                         value={newCompanyDraft.company_ho} onChange={e => setNewCompanyDraft({ ...newCompanyDraft, company_ho: e.target.value })} />
                                                 </td>
-                                                <td colSpan={5} className="px-4 py-3">
+                                                <td colSpan={4} className="px-4 py-3">
                                                     <span className="text-xs text-slate-400 italic">Auto-generated on creation</span>
                                                 </td>
                                                 <td className="px-4 py-3">
@@ -796,6 +782,7 @@ export default function AdminPanel() {
                                                 <td className="px-4 py-3">
                                                     <span className="text-xs text-slate-400 italic">-</span>
                                                 </td>
+                                                <td className="px-4 py-3" />
                                                 <td className="px-4 py-3 text-right">
                                                     <button onClick={handleCreateCompany}
                                                         className="text-xs font-bold text-white bg-green-600 hover:bg-green-500 px-3 py-1.5 rounded-lg shadow-sm w-full">{t.create}</button>
@@ -856,6 +843,11 @@ export default function AdminPanel() {
                                                     </td>
                                                     <td className="px-4 py-3">
                                                         <span className="text-xs text-slate-500">{new Date(c.created_at).toLocaleDateString()}</span>
+                                                    </td>
+                                                    <td className="px-4 py-3 text-center">
+                                                        <input type="checkbox" checked={!!d.maintenance_pilot} title={t.pilotHint} aria-label={`${t.pilot} — ${c.company_name}`}
+                                                            onChange={e => handleCompanyDraft(c.company_id, 'maintenance_pilot', e.target.checked ? 1 : 0)}
+                                                            disabled={!currentStaff || !canEditCompanies} className="w-4 h-4 accent-[#FF6B00] disabled:opacity-50" />
                                                     </td>
                                                     <td className="px-4 py-3 text-right">
                                                         {dirty && canEditCompanies ? (

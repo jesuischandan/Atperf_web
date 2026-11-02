@@ -5,17 +5,21 @@ from sqlalchemy.orm import Session
 import models
 import schemas
 from database import get_gcp_db
+from security import rate_limit, require_user
 from dependencies import openai_client, logger
 from prompts.DecisionRadar import DECISION_RADAR_SYSTEM_PROMPT, DecisionRadarAIResponse, build_radar_prompt
 
 router = APIRouter(tags=["Decision Radar"])
 
 @router.get("/api/decision-radar/history", response_model=list[schemas.DecisionRadarResponse])
-def get_radar_history(user_id: Optional[str] = None, skip: int = 0, limit: int = 50, gcp_db: Session = Depends(get_gcp_db)):
-    """Fetch Decision Radar submission history, optionally filtered by user_id."""
-    query = gcp_db.query(models.DecisionRadarSubmission)
-    if user_id:
-        query = query.filter(models.DecisionRadarSubmission.user_id == user_id)
+def get_radar_history(user_id: Optional[str] = None, skip: int = 0, limit: int = 50, gcp_db: Session = Depends(get_gcp_db),
+                      current_user: models.ExternalUser = Depends(require_user)):
+    """Fetch the logged-in user's Decision Radar submission history."""
+    if user_id and user_id != current_user.user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You can only view your own history.")
+    query = gcp_db.query(models.DecisionRadarSubmission).filter(
+        models.DecisionRadarSubmission.user_id == current_user.user_id
+    )
     submissions = (
         query
         .order_by(models.DecisionRadarSubmission.created_at.desc())
@@ -26,8 +30,12 @@ def get_radar_history(user_id: Optional[str] = None, skip: int = 0, limit: int =
     return submissions
 
 
-@router.post("/api/decision-radar/analyze", response_model=schemas.DecisionRadarResponse)
-async def analyze_decision_radar(payload: schemas.DecisionRadarCreate, gcp_db: Session = Depends(get_gcp_db)):
+@router.post("/api/decision-radar/analyze", response_model=schemas.DecisionRadarResponse,
+             dependencies=[Depends(rate_limit("ai", 60, 3600))])
+async def analyze_decision_radar(payload: schemas.DecisionRadarCreate, gcp_db: Session = Depends(get_gcp_db),
+                                 current_user: models.ExternalUser = Depends(require_user)):
+    # The session decides who is submitting, never the request body.
+    payload.user_id = current_user.user_id
     try:
         # Require authenticated user
         if not payload.user_id:

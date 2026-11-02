@@ -4,6 +4,7 @@ import { Menu, X } from 'lucide-react';
 import ProfileModal from './ProfileModal';
 import ContactSection from './ContactSection';
 import Footer from './Footer';
+import { logout as endSession } from '../utils/apiClient';
 
 const T = {
     en: {
@@ -66,7 +67,7 @@ const ContactPage = () => {
     const t = T[lang] || T.en;
 
     const logout = () => {
-        localStorage.removeItem('proextract_user');
+        endSession('user');
         setUser(null);
         navigate('/');
     };

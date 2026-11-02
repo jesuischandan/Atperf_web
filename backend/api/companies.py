@@ -6,17 +6,19 @@ import uuid
 import models
 import schemas
 from database import get_gcp_db
+from security import Principal, require_admin_panel, require_company_editor
 
 router = APIRouter(tags=["Companies"])
 
 @router.get("/companies", response_model=List[schemas.CompanyResponse])
-def list_companies(gcp_db: Session = Depends(get_gcp_db)):
+def list_companies(gcp_db: Session = Depends(get_gcp_db), _: Principal = Depends(require_admin_panel)):
     """List all companies."""
     return gcp_db.query(models.GCPCompany).order_by(models.GCPCompany.created_at.desc()).all()
 
 
 @router.post("/companies", response_model=schemas.CompanyResponse, status_code=status.HTTP_201_CREATED)
-def create_company(company_in: schemas.CompanyCreate, gcp_db: Session = Depends(get_gcp_db)):
+def create_company(company_in: schemas.CompanyCreate, gcp_db: Session = Depends(get_gcp_db),
+                   _: Principal = Depends(require_company_editor)):
     existing = gcp_db.query(models.GCPCompany).filter(
         models.GCPCompany.company_name == company_in.company_name
     ).first()
@@ -37,7 +39,8 @@ def create_company(company_in: schemas.CompanyCreate, gcp_db: Session = Depends(
 
 
 @router.patch("/companies/{company_id}", response_model=schemas.CompanyResponse)
-def update_company(company_id: str, payload: schemas.CompanyUpdate, gcp_db: Session = Depends(get_gcp_db)):
+def update_company(company_id: str, payload: schemas.CompanyUpdate, gcp_db: Session = Depends(get_gcp_db),
+                   principal: Principal = Depends(require_company_editor)):
     company = gcp_db.query(models.GCPCompany).filter(models.GCPCompany.company_id == company_id).first()
     if company is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Company not found.")
@@ -58,6 +61,11 @@ def update_company(company_id: str, payload: schemas.CompanyUpdate, gcp_db: Sess
         company.total_credits = payload.total_credits
     if payload.max_users is not None:
         company.max_users = payload.max_users
+    if payload.maintenance_pilot is not None and bool(payload.maintenance_pilot) != bool(company.maintenance_pilot):
+        # Enabling a STRAP Maintenance pilot is an Atperf decision, not a client one.
+        if principal.staff is None:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only Atperf staff can enable STRAP Maintenance.")
+        company.maintenance_pilot = 1 if payload.maintenance_pilot else 0
 
     gcp_db.commit()
     gcp_db.refresh(company)

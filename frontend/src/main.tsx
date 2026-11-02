@@ -5,6 +5,9 @@ import './index.css'
 import { applyLangFromUrl } from './utils/siteConfig'
 
 applyLangFromUrl()
+import { installApiClient } from './utils/apiClient'
+
+installApiClient()
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String, Text, DateTime, Enum, ForeignKey, Integer, func, SmallInteger, Float
+from sqlalchemy import Column, String, Text, DateTime, Enum, ForeignKey, Integer, func, SmallInteger, Float, Date, UniqueConstraint
+from sqlalchemy import JSON as PortableJSON
 from sqlalchemy.dialects.mysql import JSON, LONGTEXT
 from sqlalchemy.orm import relationship
 import uuid
@@ -20,7 +21,7 @@ class InternalUser(GCPBase):
         Enum('super_admin', 'developer', 'admin', 'collaborator', 'member'),
         default='member'
     )
-    permission        = Column(LONGTEXT,     nullable=True)
+    permission        = Column(Text().with_variant(LONGTEXT, "mysql"), nullable=True)
     mfa_enabled       = Column(SmallInteger, default=0)
     mfa_secret        = Column(String(255),  nullable=True)
     is_email_verified = Column(SmallInteger, default=0)
@@ -53,6 +54,7 @@ class GCPCompany(GCPBase):
     company_status         = Column(Enum('active', 'suspended', 'trial_expired'), default='active')
     total_credits          = Column(Integer,     default=0)
     max_users              = Column(Integer,     default=5)
+    maintenance_pilot      = Column(SmallInteger, default=0)  # STRAP Maintenance enabled for this client
     billing_contact_email  = Column(String(255), nullable=True, unique=True)
     created_at             = Column(DateTime,    server_default=func.now())
     updated_at             = Column(DateTime,    server_default=func.now(), onupdate=func.now())
@@ -205,4 +207,106 @@ class StrapilotSession(GCPBase):
     strap_analysis_payload = Column(JSON, nullable=True) # STRAP 7-block output
     status = Column(Enum('uploaded', 'columns_analyzed', 'columns_confirmed', 'dashboard_ready', 'strap_ready'), default='uploaded')
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# STRAP Maintenance — imported histories, configuration and expert decisions
+# ─────────────────────────────────────────────────────────────────────────────
+class MaintDataset(GCPBase):
+    __tablename__ = "maint_datasets"
+
+    id              = Column(String(36),  primary_key=True, default=lambda: str(uuid.uuid4()))
+    company_id      = Column(String(36),  nullable=True, index=True)   # NULL = Atperf internal (staff only)
+    name            = Column(String(255), nullable=False)
+    source_filename = Column(String(255), nullable=True)
+    weights         = Column(PortableJSON, nullable=False)
+    thresholds      = Column(PortableJSON, nullable=False)
+    windows         = Column(PortableJSON, nullable=False)
+    import_report   = Column(PortableJSON, nullable=True)
+    created_by_kind = Column(String(10),  nullable=True)                # "user" / "staff"
+    created_by_id   = Column(String(64),  nullable=True)
+    created_by_name = Column(String(255), nullable=True)
+    created_at      = Column(DateTime,    server_default=func.now())
+    updated_at      = Column(DateTime,    server_default=func.now(), onupdate=func.now())
+
+
+class MaintEquipment(GCPBase):
+    __tablename__ = "maint_equipments"
+    __table_args__ = (UniqueConstraint("dataset_id", "code"),)
+
+    id                = Column(Integer,     primary_key=True, autoincrement=True)
+    dataset_id        = Column(String(36),  ForeignKey("maint_datasets.id"), nullable=False, index=True)
+    code              = Column(String(100), nullable=False)
+    name              = Column(String(255), nullable=True)
+    tag               = Column(String(100), nullable=True)
+    subsystem         = Column(String(255), nullable=True)
+    criticality_label = Column(String(100), nullable=True)
+    criticality_note  = Column(Float,       nullable=True)
+
+
+class MaintNotice(GCPBase):
+    __tablename__ = "maint_notices"
+    __table_args__ = (UniqueConstraint("dataset_id", "code"),)
+
+    id            = Column(Integer,     primary_key=True, autoincrement=True)
+    dataset_id    = Column(String(36),  ForeignKey("maint_datasets.id"), nullable=False, index=True)
+    code          = Column(String(100), nullable=False)
+    date          = Column(Date,        nullable=False)
+    equipment     = Column(String(100), nullable=False)
+    flux          = Column(String(10),  nullable=False)                 # ROUGE / VERT / JAUNE
+    category      = Column(String(255), nullable=True)
+    symptom       = Column(String(500), nullable=True)
+    description   = Column(Text,        nullable=True)
+    status        = Column(String(100), nullable=True)
+    postponements = Column(Integer,     default=0)
+    issuer        = Column(String(255), nullable=True)
+    context_note  = Column(Integer,     nullable=True)                  # manual 0–5 (V1)
+    overrides     = Column(PortableJSON, nullable=True)                 # expert note overrides {criterion: 0–5}
+
+
+class MaintWorkOrder(GCPBase):
+    __tablename__ = "maint_work_orders"
+    __table_args__ = (UniqueConstraint("dataset_id", "code"),)
+
+    id             = Column(Integer,     primary_key=True, autoincrement=True)
+    dataset_id     = Column(String(36),  ForeignKey("maint_datasets.id"), nullable=False, index=True)
+    code           = Column(String(100), nullable=False)
+    date           = Column(Date,        nullable=False)
+    equipment      = Column(String(100), nullable=False)
+    flux           = Column(String(10),  nullable=False)
+    type           = Column(String(255), nullable=True)
+    symptom        = Column(String(500), nullable=True)
+    cause          = Column(String(500), nullable=True)
+    downtime_hours = Column(Float,       nullable=True)
+    status         = Column(String(100), nullable=True)
+    linked_notice  = Column(String(100), nullable=True)
+
+
+class MaintLink(GCPBase):
+    """Yellow → red matches recorded in the imported file (hypotheses until an expert decides)."""
+    __tablename__ = "maint_links"
+
+    id            = Column(Integer,     primary_key=True, autoincrement=True)
+    dataset_id    = Column(String(36),  ForeignKey("maint_datasets.id"), nullable=False, index=True)
+    notice_code   = Column(String(100), nullable=False)
+    wo_code       = Column(String(100), nullable=False)
+    expert_status = Column(String(100), nullable=True)
+
+
+class MaintDecision(GCPBase):
+    """Audit log: expert validations, rejections, corrections and configuration changes."""
+    __tablename__ = "maint_decisions"
+
+    id             = Column(Integer,     primary_key=True, autoincrement=True)
+    dataset_id     = Column(String(36),  ForeignKey("maint_datasets.id"), nullable=False, index=True)
+    target_type    = Column(String(20),  nullable=False)                # notice / link / config
+    target         = Column(String(210), nullable=False)                # notice code, "AV-1>OT-2", "config"
+    decision       = Column(String(20),  nullable=False)                # validated / rejected / corrected / updated
+    comment        = Column(Text,        nullable=True)
+    changes        = Column(PortableJSON, nullable=True)
+    score_snapshot = Column(Integer,     nullable=True)
+    actor_kind     = Column(String(10),  nullable=True)
+    actor_id       = Column(String(64),  nullable=True)
+    actor_name     = Column(String(255), nullable=True)
+    created_at     = Column(DateTime,    server_default=func.now())

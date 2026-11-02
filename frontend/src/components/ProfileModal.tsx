@@ -3,6 +3,7 @@ import { X, Loader2, Trash2, AlertTriangle, ShieldCheck, MailWarning, Building, 
 import { useNavigate } from 'react-router-dom';
 
 import API_URL from '../utils/apiUrl';
+import { logout as endSession } from '../utils/apiClient';
 
 interface User {
     user_id: string;
@@ -115,7 +116,7 @@ export default function ProfileModal({ user, onClose, onUpdate }: ProfileModalPr
                 const data = await res.json().catch(() => ({}));
                 throw new Error(data.detail || 'Failed to delete account');
             }
-            localStorage.removeItem('proextract_user');
+            endSession('user');
             navigate('/');
             onClose();
         } catch (err: any) {

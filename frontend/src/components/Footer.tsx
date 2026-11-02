@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Linkedin, LogIn, LogOut, UserPlus } from 'lucide-react';
+import { logout as endSession } from '../utils/apiClient';
 
 const TRANSLATIONS = {
     en: {
@@ -100,7 +101,7 @@ export default function Footer({ lang }: { lang: 'en' | 'fr' }) {
                                             </button>
                                             <button 
                                                 onClick={() => { 
-                                                    localStorage.removeItem('proextract_staff'); 
+                                                    endSession('staff'); 
                                                     navigate('/'); 
                                                 }} 
                                                 className="text-slate-500 hover:text-[#FF6B00] flex items-center gap-2 transition-colors"

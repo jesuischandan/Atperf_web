@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Navigation, ArrowLeft, ArrowRight, BarChart3, ListFilter, Users, Menu, X } from 'lucide-react';
 import Footer from './Footer';
+import { logout as endSession } from '../utils/apiClient';
 
 const translations = {
     en: {
@@ -85,7 +86,7 @@ const DecisionRadarLanding = () => {
                             </button>
                             <button
                                 onClick={() => {
-                                    localStorage.removeItem('proextract_user');
+                                    endSession('user');
                                     setUser(null);
                                 }}
                                 className="bg-slate-100 text-slate-600 px-5 py-2 rounded-full text-sm font-semibold hover:bg-slate-200 transition-all shadow-sm"
@@ -142,7 +143,7 @@ const DecisionRadarLanding = () => {
                                     </button>
                                     <button
                                         onClick={() => {
-                                            localStorage.removeItem('proextract_user');
+                                            endSession('user');
                                             setUser(null);
                                             setIsMobileMenuOpen(false);
                                         }}

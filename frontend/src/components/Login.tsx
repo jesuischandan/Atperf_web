@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Loader2, Eye, EyeOff } from 'lucide-react';
 
 import API_URL from '../utils/apiUrl';
@@ -55,6 +55,7 @@ type Step = 'login' | 'forgot_email' | 'forgot_otp' | 'forgot_reset';
 
 export default function Login() {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     
     const [step, setStep] = useState<Step>('login');
     const [email, setEmail] = useState('');
@@ -87,7 +88,11 @@ export default function Login() {
             
             localStorage.setItem('proextract_user', JSON.stringify(data));
             setInfo(`Welcome back, ${data.first_name}.`);
-            if (data.role === 'admin' || data.role === 'super_admin') {
+            // Return to the page that asked for a login (internal paths only, never another site).
+            const redirect = searchParams.get('redirect');
+            if (redirect && redirect.startsWith('/') && !redirect.startsWith('//')) {
+                navigate(redirect);
+            } else if (data.role === 'admin' || data.role === 'super_admin') {
                 navigate('/admin');
             } else {
                 navigate('/');

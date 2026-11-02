@@ -1,10 +1,11 @@
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 import models
 import schemas
 from database import get_gcp_db
+from security import Principal, get_principal, rate_limit, require_user
 from dependencies import openai_client, logger
 from prompts.StrapDiagnostic import STRAP_SYSTEM_PROMPT, StrapAIResponse, build_strap_prompt
 
@@ -35,8 +36,16 @@ def calc_penalty(answer_str: str, question: str) -> float:
         factor = 0.20
     return factor
 
-@router.post("/analyze-strap", response_model=schemas.StrapDiagnosticResponse)
-async def analyze_strap(payload: schemas.StrapDiagnosticCreate, gcp_db: Session = Depends(get_gcp_db)):
+@router.post("/analyze-strap", response_model=schemas.StrapDiagnosticResponse,
+             dependencies=[Depends(rate_limit("ai", 60, 3600))])
+async def analyze_strap(payload: schemas.StrapDiagnosticCreate, gcp_db: Session = Depends(get_gcp_db),
+                        principal: Principal = Depends(get_principal)):
+    # Anonymous diagnostics stay allowed; a user_id is only honoured for the logged-in user.
+    if payload.user_id and (principal.user is None or principal.user.user_id != payload.user_id):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated. Please log in.")
+    if principal.user is not None:
+        payload.user_id = principal.user.user_id
+        payload.company_id = principal.user.company_id
     if payload.user_id:
         user = gcp_db.query(models.ExternalUser).filter(models.ExternalUser.user_id == payload.user_id).first()
         if user and user.credit_balance < 1:
@@ -139,7 +148,11 @@ async def analyze_strap(payload: schemas.StrapDiagnosticCreate, gcp_db: Session 
     return db_strap
 
 @router.get("/api/strap-diagnostics/history", response_model=List[schemas.StrapDiagnosticResponse])
-async def get_strap_history(user_id: str, gcp_db: Session = Depends(get_gcp_db)):
+async def get_strap_history(user_id: Optional[str] = None, gcp_db: Session = Depends(get_gcp_db),
+                            current_user: models.ExternalUser = Depends(require_user)):
+    if user_id and user_id != current_user.user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You can only view your own history.")
+    user_id = current_user.user_id
     diagnostics = gcp_db.query(models.StrapDiagnosticSubmission)\
         .filter(models.StrapDiagnosticSubmission.user_id == user_id)\
         .order_by(models.StrapDiagnosticSubmission.created_at.desc())\

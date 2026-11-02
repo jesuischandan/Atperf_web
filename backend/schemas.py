@@ -24,6 +24,7 @@ class CompanyResponse(CompanyBase):
     company_status: str
     total_credits: int
     max_users: int
+    maintenance_pilot: Optional[int] = 0
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
@@ -39,6 +40,7 @@ class CompanyUpdate(BaseModel):
     company_status: Optional[str] = None
     total_credits: Optional[int] = None
     max_users: Optional[int] = None
+    maintenance_pilot: Optional[int] = None
 
 
 class UserBase(BaseModel):
@@ -70,6 +72,7 @@ class UserResponse(UserBase):
     is_email_verified: int = 0
     created_at: datetime
     company_name: Optional[str] = None
+    maintenance_pilot: Optional[int] = 0
 
     model_config = ConfigDict(from_attributes=True)
 

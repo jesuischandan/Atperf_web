@@ -8,15 +8,17 @@ load_dotenv()
 # ─────────────────────────────────────────────
 # GCP DB — atperf (single database for all tables)
 # ─────────────────────────────────────────────
-GCP_DB_USER     = os.getenv("GCP_DB_USER",     "atperf_admin")
-GCP_DB_PASSWORD = os.getenv("GCP_DB_PASSWORD", "AtperfAdmin")
-GCP_DB_HOST     = os.getenv("GCP_DB_HOST",     "34.155.81.181")
-GCP_DB_PORT     = os.getenv("GCP_DB_PORT",     "3306")
-GCP_DB_NAME     = os.getenv("GCP_DB_NAME",     "atperf")
-
-GCP_DATABASE_URL = (
-    f"mysql+pymysql://{GCP_DB_USER}:{GCP_DB_PASSWORD}@{GCP_DB_HOST}:{GCP_DB_PORT}/{GCP_DB_NAME}"
-)
+# Credentials come from the environment (backend/.env) only — never from the code.
+# GCP_DATABASE_URL, when set, overrides the individual parts (e.g. tests use SQLite).
+GCP_DATABASE_URL = os.getenv("GCP_DATABASE_URL")
+if not GCP_DATABASE_URL:
+    missing = [k for k in ("GCP_DB_USER", "GCP_DB_PASSWORD", "GCP_DB_HOST") if not os.getenv(k)]
+    if missing:
+        raise RuntimeError(f"Missing database settings in backend/.env: {', '.join(missing)}")
+    GCP_DATABASE_URL = (
+        f"mysql+pymysql://{os.getenv('GCP_DB_USER')}:{os.getenv('GCP_DB_PASSWORD')}"
+        f"@{os.getenv('GCP_DB_HOST')}:{os.getenv('GCP_DB_PORT', '3306')}/{os.getenv('GCP_DB_NAME', 'atperf')}"
+    )
 
 gcp_engine      = create_engine(GCP_DATABASE_URL)
 GCPSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=gcp_engine)

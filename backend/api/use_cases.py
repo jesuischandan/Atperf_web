@@ -9,11 +9,15 @@ from pathlib import Path
 import models
 import schemas
 from database import get_gcp_db
+from security import Principal, get_principal, rate_limit, require_admin_panel
 
 router = APIRouter(tags=["Use Cases"])
 
 # Base media directory — all uploads and gallery scans use this
 MEDIA_DIR = Path(__file__).parent.parent.parent / "frontend" / "public" / "media"
+
+# Files are served from the site origin, so only inert media types are accepted (no HTML / SVG).
+ALLOWED_UPLOAD_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".avif", ".mp4", ".webm", ".mov", ".pdf"}
 
 def get_media_subdir(mime_type: str) -> tuple[Path, str]:
     """Return (absolute_dir, url_subpath) based on file MIME type."""
@@ -31,7 +35,7 @@ def get_media_subdir(mime_type: str) -> tuple[Path, str]:
 # ─────────────────────────────────────────────
 
 @router.get("/use-cases/gallery")
-def get_media_gallery():
+def get_media_gallery(_: Principal = Depends(require_admin_panel)):
     """Scan centralized media/ directory and return categorized file list."""
     if not MEDIA_DIR.exists():
         return {"photos": [], "videos": [], "pdfs": [], "logos": []}
@@ -73,9 +77,12 @@ def get_media_gallery():
 async def upload_use_case_file(
     file: UploadFile = File(...),
     company_name: str = Form(default=""),
-    year: str = Form(default=str(datetime.now().year))
+    year: str = Form(default=str(datetime.now().year)),
+    _: Principal = Depends(require_admin_panel),
 ):
     """Upload a media file into the centralized media/ directory."""
+    if Path(file.filename or "").suffix.lower() not in ALLOWED_UPLOAD_EXTENSIONS:
+        raise HTTPException(status_code=400, detail="Unsupported file type. Allowed: images, MP4/WebM/MOV videos, PDF.")
     content_type = file.content_type or ""
     dest_dir, url_subpath = get_media_subdir(content_type)
     dest_dir.mkdir(parents=True, exist_ok=True)
@@ -102,7 +109,7 @@ async def upload_use_case_file(
 
 
 @router.delete("/use-cases/gallery/file")
-async def delete_gallery_file(url: str):
+async def delete_gallery_file(url: str, _: Principal = Depends(require_admin_panel)):
     """Delete a file from the centralized media library by its public URL."""
     if not url.startswith("/media/"):
         raise HTTPException(status_code=400, detail="Invalid media URL")
@@ -127,8 +134,11 @@ async def delete_gallery_file(url: str):
 # ─────────────────────────────────────────────
 
 @router.get("/use-cases", response_model=List[schemas.UseCaseResponse])
-def list_use_cases(status: Optional[str] = None, gcp_db: Session = Depends(get_gcp_db)):
-    """List use cases. Pass status='published' or 'draft'."""
+def list_use_cases(status: Optional[str] = None, gcp_db: Session = Depends(get_gcp_db),
+                   principal: Principal = Depends(get_principal)):
+    """List use cases. Pass status='published' or 'draft'. Anything but published is staff-only."""
+    if status != "published" and not principal.can_open_admin_panel:
+        raise HTTPException(status_code=403, detail="You do not have permission to do this.")
     query = gcp_db.query(models.UseCase)
     if status:
         query = query.filter(models.UseCase.status == status)
@@ -147,15 +157,15 @@ def get_use_case_by_identifier(db, identifier: str):
 
 
 @router.get("/use-cases/{id}", response_model=schemas.UseCaseResponse)
-def get_use_case(id: str, gcp_db: Session = Depends(get_gcp_db)):
+def get_use_case(id: str, gcp_db: Session = Depends(get_gcp_db), principal: Principal = Depends(get_principal)):
     uc = get_use_case_by_identifier(gcp_db, id)
-    if not uc:
+    if not uc or (uc.status != "published" and not principal.can_open_admin_panel):
         raise HTTPException(status_code=404, detail="Use case not found")
     return uc
 
 
 @router.post("/use-cases", response_model=schemas.UseCaseResponse, status_code=201)
-def create_use_case(payload: schemas.UseCaseCreate, gcp_db: Session = Depends(get_gcp_db)):
+def create_use_case(payload: schemas.UseCaseCreate, gcp_db: Session = Depends(get_gcp_db), _: Principal = Depends(require_admin_panel)):
     uc = models.UseCase(**payload.model_dump())
     gcp_db.add(uc)
     gcp_db.commit()
@@ -164,7 +174,7 @@ def create_use_case(payload: schemas.UseCaseCreate, gcp_db: Session = Depends(ge
 
 
 @router.patch("/use-cases/{id}", response_model=schemas.UseCaseResponse)
-def update_use_case(id: str, payload: schemas.UseCaseUpdate, gcp_db: Session = Depends(get_gcp_db)):
+def update_use_case(id: str, payload: schemas.UseCaseUpdate, gcp_db: Session = Depends(get_gcp_db), _: Principal = Depends(require_admin_panel)):
     uc = gcp_db.query(models.UseCase).filter(models.UseCase.id == id).first()
     if not uc:
         raise HTTPException(status_code=404, detail="Use case not found")
@@ -179,7 +189,7 @@ def update_use_case(id: str, payload: schemas.UseCaseUpdate, gcp_db: Session = D
 
 
 @router.delete("/use-cases/{id}", status_code=204)
-def delete_use_case(id: str, gcp_db: Session = Depends(get_gcp_db)):
+def delete_use_case(id: str, gcp_db: Session = Depends(get_gcp_db), _: Principal = Depends(require_admin_panel)):
     uc = gcp_db.query(models.UseCase).filter(models.UseCase.id == id).first()
     if not uc:
         raise HTTPException(status_code=404, detail="Use case not found")
@@ -187,7 +197,7 @@ def delete_use_case(id: str, gcp_db: Session = Depends(get_gcp_db)):
     gcp_db.commit()
 
 
-@router.post("/use-cases/{id}/like")
+@router.post("/use-cases/{id}/like", dependencies=[Depends(rate_limit("like", 30, 600))])
 def like_use_case(id: str, gcp_db: Session = Depends(get_gcp_db)):
     uc = get_use_case_by_identifier(gcp_db, id)
     if not uc:
@@ -197,7 +207,8 @@ def like_use_case(id: str, gcp_db: Session = Depends(get_gcp_db)):
     return {"likes_count": uc.likes_count}
 
 
-@router.post("/use-cases/{id}/comments", response_model=schemas.UseCaseCommentResponse)
+@router.post("/use-cases/{id}/comments", response_model=schemas.UseCaseCommentResponse,
+             dependencies=[Depends(rate_limit("comment", 5, 600))])
 def add_use_case_comment(id: str, payload: schemas.UseCaseCommentCreate, gcp_db: Session = Depends(get_gcp_db)):
     uc = get_use_case_by_identifier(gcp_db, id)
     if not uc:
@@ -215,7 +226,8 @@ def add_use_case_comment(id: str, payload: schemas.UseCaseCommentCreate, gcp_db:
 
 
 @router.post("/use-cases/{id}/comments/{comment_id}/reply", response_model=schemas.UseCaseCommentResponse)
-def reply_use_case_comment(id: str, comment_id: str, payload: schemas.UseCaseCommentReplyCreate, gcp_db: Session = Depends(get_gcp_db)):
+def reply_use_case_comment(id: str, comment_id: str, payload: schemas.UseCaseCommentReplyCreate,
+                           gcp_db: Session = Depends(get_gcp_db), _: Principal = Depends(require_admin_panel)):
     uc = get_use_case_by_identifier(gcp_db, id)
     if not uc:
         raise HTTPException(status_code=404, detail="Use case not found")
@@ -236,7 +248,7 @@ def reply_use_case_comment(id: str, comment_id: str, payload: schemas.UseCaseCom
 
 
 @router.delete("/use-cases/{id}/comments/{comment_id}", status_code=204)
-def delete_use_case_comment(id: str, comment_id: str, gcp_db: Session = Depends(get_gcp_db)):
+def delete_use_case_comment(id: str, comment_id: str, gcp_db: Session = Depends(get_gcp_db), _: Principal = Depends(require_admin_panel)):
     uc = get_use_case_by_identifier(gcp_db, id)
     if not uc:
         raise HTTPException(status_code=404, detail="Use case not found")
