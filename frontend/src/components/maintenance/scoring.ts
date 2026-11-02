@@ -126,6 +126,11 @@ export function scoreAll(w: Weights, t: Thresholds): ScoredNotice[] {
         .sort((a, b) => b.score - a.score || a.date.localeCompare(b.date));
 }
 
+const sameSubsystem = (a: string, b: string) => {
+    const sa = equipmentById.get(a)?.subsystem, sb = equipmentById.get(b)?.subsystem;
+    return !!sa && sa === sb;
+};
+
 /* ── Replay: a red failure and the yellow notices that preceded it ── */
 
 export interface Precursor {
@@ -133,13 +138,16 @@ export interface Precursor {
     leadDays: number;
     linkStatus: string | null; // expert status from the dataset, or null for an automatic candidate
     sameEquipment: boolean;
+    sameSubsystem: boolean;    // other asset of the same sub-assembly (weaker candidate)
     flagged: boolean;
 }
 
 /**
  * Yellow notices created before the failure: every one on the same equipment
- * within the horizon (automatic candidates), plus any link recorded in the
- * dataset (including deliberately wrong ones, kept for expert rejection).
+ * or on another asset of the same sub-assembly within the horizon (automatic
+ * candidates), plus any link recorded in the dataset (including deliberately
+ * wrong ones, kept for expert rejection). Chronological proximity only — never
+ * presented as causality.
  */
 export function precursors(ot: WorkOrder, scored: ScoredNotice[], horizonDays: number, t: Thresholds): Precursor[] {
     const byId = new Map(scored.map(n => [n.id, n]));
@@ -147,8 +155,11 @@ export function precursors(ot: WorkOrder, scored: ScoredNotice[], horizonDays: n
 
     for (const n of scored) {
         const lead = daysBetween(n.date, ot.date);
-        if (n.equipmentId === ot.equipmentId && lead > 0 && lead <= horizonDays) {
-            out.set(n.id, { notice: n, leadDays: lead, linkStatus: null, sameEquipment: true, flagged: n.score >= t.high });
+        if (!(lead > 0 && lead <= horizonDays)) continue;
+        if (n.equipmentId === ot.equipmentId) {
+            out.set(n.id, { notice: n, leadDays: lead, linkStatus: null, sameEquipment: true, sameSubsystem: true, flagged: n.score >= t.high });
+        } else if (sameSubsystem(n.equipmentId, ot.equipmentId)) {
+            out.set(n.id, { notice: n, leadDays: lead, linkStatus: null, sameEquipment: false, sameSubsystem: true, flagged: n.score >= t.high });
         }
     }
     for (const l of DATA.links.filter(l => l.workOrderId === ot.id)) {
@@ -161,6 +172,7 @@ export function precursors(ot: WorkOrder, scored: ScoredNotice[], horizonDays: n
             leadDays: lead,
             linkStatus: l.expertStatus,
             sameEquipment: n.equipmentId === ot.equipmentId,
+            sameSubsystem: sameSubsystem(n.equipmentId, ot.equipmentId),
             flagged: n.score >= t.high,
         });
     }
@@ -206,4 +218,68 @@ export function metrics(scored: ScoredNotice[], horizonDays: number, threshold: 
     const medianLeadDays = leads.length ? leads[Math.floor(leads.length / 2)] : null;
 
     return { reds: redWorkOrders.length, covered, alerts: alerts.length, falseAlerts, noPrecursor, medianLeadDays };
+}
+
+/* ── Demonstrator KPIs (illustrative dataset) ── */
+
+/** Reference date of the demonstrator: the last event in the dataset. */
+export const STUDY_DATE = [...DATA.notices.map(n => n.date), ...DATA.workOrders.map(o => o.date)].sort().at(-1)!;
+
+export const isClosed = (n: Notice) => n.status === 'Clôturé';
+
+export interface AgeBand { label: string; min: number; max: number; count: number }
+
+export function backlog(scored: ScoredNotice[]) {
+    const open = scored.filter(n => !isClosed(n)).map(n => ({ ...n, ageDays: daysBetween(n.date, STUDY_DATE) }));
+    const bands: AgeBand[] = [
+        { label: '0–30', min: 0, max: 30, count: 0 },
+        { label: '31–90', min: 31, max: 90, count: 0 },
+        { label: '91–180', min: 91, max: 180, count: 0 },
+        { label: '> 180', min: 181, max: Infinity, count: 0 },
+    ];
+    for (const n of open) bands.find(b => n.ageDays >= b.min && n.ageDays <= b.max)!.count++;
+    const meanAge = open.length ? Math.round(open.reduce((s, n) => s + n.ageDays, 0) / open.length) : null;
+    return { open, bands, meanAge };
+}
+
+/**
+ * Share of yellow notices followed by a red breakdown on the same asset within
+ * `windowDays`. Only notices whose whole window is observed (date + window ≤
+ * study date) are counted, so recent notices do not dilute the rate.
+ */
+export function followedByRed(windowDays: number) {
+    const observed = yellowNotices.filter(n => daysBetween(n.date, STUDY_DATE) >= windowDays);
+    const followed = observed.filter(n => redWorkOrders.some(o => {
+        const d = daysBetween(n.date, o.date);
+        return o.equipmentId === n.equipmentId && d > 0 && d <= windowDays;
+    }));
+    return { observed: observed.length, followed: followed.length, rate: observed.length ? followed.length / observed.length : null };
+}
+
+export function treatment() {
+    const closed = yellowNotices.filter(isClosed).length;
+    return { closed, total: yellowNotices.length, rate: yellowNotices.length ? closed / yellowNotices.length : null };
+}
+
+export interface Reliability {
+    equipment: Equipment;
+    breakdowns: number;
+    downtimeHours: number;
+    mttrHours: number | null;   // mean recorded downtime per breakdown (approximation of repair time)
+    mtbfDays: number | null;    // mean calendar days between successive breakdowns (needs ≥ 2)
+}
+
+export function reliability(): Reliability[] {
+    return DATA.equipments.map(e => {
+        const reds = redWorkOrders.filter(o => o.equipmentId === e.id).sort((a, b) => a.date.localeCompare(b.date));
+        const downtime = reds.reduce((s, o) => s + (o.downtimeHours || 0), 0);
+        const gaps = reds.slice(1).map((o, i) => daysBetween(reds[i].date, o.date));
+        return {
+            equipment: e,
+            breakdowns: reds.length,
+            downtimeHours: downtime,
+            mttrHours: reds.length ? Math.round((downtime / reds.length) * 10) / 10 : null,
+            mtbfDays: gaps.length ? Math.round(gaps.reduce((s, g) => s + g, 0) / gaps.length) : null,
+        };
+    }).sort((a, b) => (a.mtbfDays ?? Infinity) - (b.mtbfDays ?? Infinity) || b.breakdowns - a.breakdowns);
 }
