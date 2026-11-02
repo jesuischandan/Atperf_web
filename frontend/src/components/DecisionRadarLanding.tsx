@@ -73,7 +73,7 @@ const DecisionRadarLanding = () => {
                     <ArrowLeft size={18} /> <span className="hidden sm:inline">{t.back}</span>
                 </button>
                 <div className="flex items-center gap-2">
-                    <span className="text-xl font-bold tracking-tight text-slate-900">StrAP Tools</span>
+                    <span className="text-xl font-bold tracking-tight text-slate-900">STRAP Tools</span>
                 </div>
                 
                 {/* Desktop Menu */}

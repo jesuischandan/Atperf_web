@@ -13,7 +13,7 @@ async def preview_report_email(payload: schemas.EmailPreviewRequest):
     is_fr = (payload.language.lower() == "fr")
     
     greeting = f"Bonjour {payload.recipient_name or ''}".strip() + "," if is_fr else f"Hello {payload.recipient_name or ''}".strip() + ","
-    signoff = "Bien Cordialement,\nStrAP Tools - Atperf" if is_fr else "Best Regards,\nStrAP Tools - Atperf"
+    signoff = "Bien Cordialement,\nSTRAP Tools - Atperf" if is_fr else "Best Regards,\nSTRAP Tools - Atperf"
     
     default_subject = f"Rapport: {payload.report_title}" if is_fr else f"Report: {payload.report_title}"
     default_body = f"{greeting}\n\nVeuillez trouver ci-joint le rapport.\n\n{payload.overall_outcomes}\n\n{signoff}" if is_fr else f"{greeting}\n\nPlease find attached the report.\n\n{payload.overall_outcomes}\n\n{signoff}"

@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import API_URL from '../utils/apiUrl';
 import { Mail, Phone, Linkedin, Plus, Minus, CheckCircle } from 'lucide-react';
 
 const TRANSLATIONS = {
@@ -13,8 +15,13 @@ const TRANSLATIONS = {
         phonePlaceholder: '(123) 456 - 789',
         companyLabel: 'Company',
         companyPlaceholder: 'Facebook',
+        topicLabel: 'Subject',
+        topics: { general: 'General enquiry', offers: 'STRAP® Scan / Deploy / Scale', tools: 'STRAP Tools (online tools)', maintenance: 'STRAP Maintenance' },
         messageLabel: 'Leave us a message',
         messagePlaceholder: 'Please type your message here...',
+        sentDetail: 'We will get back to you shortly.',
+        sendAnother: 'Send another message',
+        sendFailed: 'The message could not be sent. Please try again or email us directly.',
         sendBtn: 'Send Message',
         sendingBtn: 'Sending...',
         sentMsg: 'Message Sent Successfully',
@@ -27,11 +34,11 @@ const TRANSLATIONS = {
         faqSubtitle1: 'For any questions about our services, please consult our FAQ or ',
         faqSubtitleHighlight: 'contact us directly.',
         faqs: [
-            { q: 'Can we guarantee sustainable results?', a: 'Yes, our StrAP\u00ae methodology is specifically designed to anchor routines and secure lasting change. We don\'t just deliver a report; we implement tools that enforce discipline on the shop floor.' },
+            { q: 'How do you make results last?', a: 'Our STRAP\u00ae methodology is designed to anchor routines and secure lasting change. We don\'t just deliver a report: we implement business rules, indicators and tools that support discipline on the shop floor.' },
             { q: 'In which industries do you operate?', a: 'We primarily serve the manufacturing and heavy industries, but our methodology applies to any operational environment experiencing friction, including logistics and supply chain.' },
             { q: 'I want to work with you, what are the next steps?', a: 'First, reach out via this form or by phone. We will schedule a scoping call to understand your challenges, followed by a proposed engagement plan tailored to your site.' },
-            { q: 'How long does a project take?', a: 'Our engagements are designed for speed. You can expect average time-to-first-result within 6 weeks, depending on the complexity of your operations.' },
-            { q: 'What is the pricing of your services?', a: 'Our pricing is customized based on the scope of the project and the tools deployed. We optimize for a fast ROI\u2014often achieving $1M+ average yearly savings per program.' }
+            { q: 'How long does a project take?', a: 'It depends on the process and the scope. Timelines and first milestones are agreed together during the scoping call.' },
+            { q: 'What is the pricing of your services?', a: 'Our pricing is tailored to the scope of the project and the tools deployed, with objectives and indicators agreed with you from the start.' }
         ]
     },
     fr: {
@@ -45,8 +52,13 @@ const TRANSLATIONS = {
         phonePlaceholder: '+33 6 00 00 00 00',
         companyLabel: 'Entreprise',
         companyPlaceholder: 'Votre entreprise',
+        topicLabel: 'Objet',
+        topics: { general: 'Demande générale', offers: 'STRAP® Scan / Deploy / Scale', tools: 'STRAP Tools (outils en ligne)', maintenance: 'STRAP Maintenance' },
         messageLabel: 'Laissez-nous un message',
         messagePlaceholder: 'Veuillez taper votre message ici...',
+        sentDetail: 'Nous revenons vers vous rapidement.',
+        sendAnother: 'Envoyer un autre message',
+        sendFailed: 'Le message n’a pas pu être envoyé. Merci de réessayer ou de nous écrire directement.',
         sendBtn: 'Envoyer',
         sendingBtn: 'Envoi...',
         sentMsg: 'Message envoy\u00e9 avec succ\u00e8s',
@@ -59,11 +71,11 @@ const TRANSLATIONS = {
         faqSubtitle1: 'Pour toutes questions sur nos services, consultez notre FAQ ou ',
         faqSubtitleHighlight: 'contactez-nous directement.',
         faqs: [
-            { q: 'Pouvons-nous garantir des r\u00e9sultats durables ?', a: 'Oui, notre m\u00e9thodologie StrAP\u00ae est sp\u00e9cifiquement con\u00e7ue pour ancrer les routines et garantir un changement durable. Nous ne faisons pas que livrer un rapport ; nous impl\u00e9mentons des outils qui imposent la discipline sur le terrain.' },
+            { q: 'Comment rendre les r\u00e9sultats durables ?', a: 'Notre m\u00e9thodologie STRAP\u00ae est con\u00e7ue pour ancrer les routines et s\u00e9curiser un changement durable. Nous ne faisons pas que livrer un rapport : nous mettons en place des r\u00e8gles m\u00e9tier, des indicateurs et des outils qui soutiennent la discipline sur le terrain.' },
             { q: 'Dans quels secteurs d\'activit\u00e9 intervenez-vous ?', a: 'Nous intervenons principalement dans le secteur manufacturier et l\'industrie lourde, mais notre m\u00e9thodologie s\'applique \u00e0 tout environnement op\u00e9rationnel rencontrant des frictions, y compris la logistique et la supply chain.' },
             { q: 'Je souhaite travailler avec vous, quels sont les prochaines \u00e9tapes ?', a: 'Tout d\'abord, contactez-nous via ce formulaire ou par t\u00e9l\u00e9phone. Nous planifierons un appel de cadrage pour comprendre vos d\u00e9fis, suivi d\'une proposition de plan d\'intervention adapt\u00e9 \u00e0 votre site.' },
-            { q: 'Combien de temps dure un projet ?', a: 'Nos interventions sont con\u00e7ues pour \u00eatre rapides. Vous pouvez vous attendre \u00e0 de premiers r\u00e9sultats en 6 semaines en moyenne, selon la complexit\u00e9 de vos op\u00e9rations.' },
-            { q: 'Quel est le prix de nos services ?', a: 'Notre tarification est personnalis\u00e9e en fonction de la port\u00e9e du projet et des outils d\u00e9ploy\u00e9s. Nous optimisons pour un retour sur investissement rapide, r\u00e9alisant souvent plus d\'1M$ d\'\u00e9conomies annuelles moyennes par programme.' }
+            { q: 'Combien de temps dure un projet ?', a: 'Cela d\u00e9pend du processus et du p\u00e9rim\u00e8tre. Le calendrier et les premiers jalons sont d\u00e9finis ensemble lors de l\u2019appel de cadrage.' },
+            { q: 'Quel est le prix de vos services ?', a: 'Notre tarification est personnalis\u00e9e selon le p\u00e9rim\u00e8tre du projet et les outils d\u00e9ploy\u00e9s, avec des objectifs et des indicateurs d\u00e9finis ensemble d\u00e8s le d\u00e9part.' }
         ]
     }
 };
@@ -73,6 +85,9 @@ export default function ContactSection({ lang }: { lang: 'en' | 'fr' }) {
     const [openFaq, setOpenFaq] = useState<number | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSent, setIsSent] = useState(false);
+    const [searchParams] = useSearchParams();
+    const initialTopic = searchParams.get('topic');
+    const [topic, setTopic] = useState<string>(initialTopic && initialTopic in TRANSLATIONS.en.topics ? initialTopic : 'general');
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -86,11 +101,12 @@ export default function ContactSection({ lang }: { lang: 'en' | 'fr' }) {
             phone: (formData.get('phone') as string) || '',
             company: (formData.get('company') as string) || '',
             message: formData.get('message') as string,
+            topic: TRANSLATIONS.en.topics[topic as keyof typeof TRANSLATIONS.en.topics],
         };
 
         try {
-            const apiUrl = import.meta.env.VITE_API_URL || "https://atperf.com/api";
-            const response = await fetch(`${apiUrl}/contact`, {
+            // Same base URL as every other API call (the route is /api/contact on the backend).
+            const response = await fetch(`${API_URL}/api/contact`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data),
@@ -101,11 +117,11 @@ export default function ContactSection({ lang }: { lang: 'en' | 'fr' }) {
                 form.reset();
                 setTimeout(() => setIsSent(false), 5000);
             } else {
-                alert('Failed to send message. Please try again.');
+                alert(t.sendFailed);
             }
         } catch (error) {
             console.error('Error sending message:', error);
-            alert('An error occurred. Please try again later.');
+            alert(t.sendFailed);
         } finally {
             setIsSubmitting(false);
         }
@@ -131,20 +147,21 @@ export default function ContactSection({ lang }: { lang: 'en' | 'fr' }) {
                                     <CheckCircle size={40} />
                                 </div>
                                 <h3 className="text-2xl font-bold text-slate-900 mb-2">{t.sentMsg}</h3>
-                                <p className="text-slate-500">We will get back to you shortly.</p>
+                                <p className="text-slate-500">{t.sentDetail}</p>
                                 <button 
                                     onClick={() => setIsSent(false)} 
                                     className="mt-8 text-[#FF6B00] font-medium hover:underline"
                                 >
-                                    Send another message
+                                    {t.sendAnother}
                                 </button>
                             </div>
                         ) : (
                             <form onSubmit={handleSubmit} className="flex flex-col gap-6 w-full">
                                 <div className="grid sm:grid-cols-2 gap-6 w-full">
                                     <div className="flex flex-col gap-2 relative">
-                                        <label className="font-bold text-[#1a2f4c] text-sm">{t.nameLabel}</label>
+                                        <label htmlFor="contact-name" className="font-bold text-[#1a2f4c] text-sm">{t.nameLabel}</label>
                                         <input 
+                                            id="contact-name" 
                                             required
                                             name="name"
                                             type="text" 
@@ -153,8 +170,9 @@ export default function ContactSection({ lang }: { lang: 'en' | 'fr' }) {
                                         />
                                     </div>
                                     <div className="flex flex-col gap-2 relative">
-                                        <label className="font-bold text-[#1a2f4c] text-sm">{t.emailLabel}</label>
+                                        <label htmlFor="contact-email" className="font-bold text-[#1a2f4c] text-sm">{t.emailLabel}</label>
                                         <input 
+                                            id="contact-email" 
                                             required
                                             name="email"
                                             type="email" 
@@ -163,8 +181,9 @@ export default function ContactSection({ lang }: { lang: 'en' | 'fr' }) {
                                         />
                                     </div>
                                     <div className="flex flex-col gap-2 relative">
-                                        <label className="font-bold text-[#1a2f4c] text-sm">{t.phoneLabel}</label>
+                                        <label htmlFor="contact-phone" className="font-bold text-[#1a2f4c] text-sm">{t.phoneLabel}</label>
                                         <input 
+                                            id="contact-phone" 
                                             name="phone"
                                             type="tel" 
                                             placeholder={t.phonePlaceholder}
@@ -172,8 +191,9 @@ export default function ContactSection({ lang }: { lang: 'en' | 'fr' }) {
                                         />
                                     </div>
                                     <div className="flex flex-col gap-2 relative">
-                                        <label className="font-bold text-[#1a2f4c] text-sm">{t.companyLabel}</label>
+                                        <label htmlFor="contact-company" className="font-bold text-[#1a2f4c] text-sm">{t.companyLabel}</label>
                                         <input 
+                                            id="contact-company" 
                                             name="company"
                                             type="text" 
                                             placeholder={t.companyPlaceholder}
@@ -182,8 +202,16 @@ export default function ContactSection({ lang }: { lang: 'en' | 'fr' }) {
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-2 relative w-full">
-                                    <label className="font-bold text-[#1a2f4c] text-sm">{t.messageLabel}</label>
+                                    <label htmlFor="contact-topic" className="font-bold text-[#1a2f4c] text-sm">{t.topicLabel}</label>
+                                    <select id="contact-topic" name="topic" value={topic} onChange={e => setTopic(e.target.value)}
+                                        className="px-5 py-4 bg-white border border-slate-200 rounded-[1.25rem] focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/20 focus:border-[#FF6B00] transition-all font-medium text-slate-700 w-full">
+                                        {Object.entries(t.topics).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+                                    </select>
+                                </div>
+                                <div className="flex flex-col gap-2 relative w-full">
+                                    <label htmlFor="contact-message" className="font-bold text-[#1a2f4c] text-sm">{t.messageLabel}</label>
                                     <textarea 
+                                        id="contact-message" 
                                         required
                                         name="message"
                                         rows={4}
@@ -268,8 +296,8 @@ export default function ContactSection({ lang }: { lang: 'en' | 'fr' }) {
                             </div>
                             <div>
                                 <p className="text-slate-400 text-sm font-medium leading-tight">{t.emailDirect}</p>
-                                <a href="mailto:r.rahbi@atperf.com" className="text-[#FF6B00] font-bold mt-1 block hover:underline">
-                                    r.rahbi@atperf.com
+                                <a href="mailto:r.rabhi@atperf.com" className="text-[#FF6B00] font-bold mt-1 block hover:underline">
+                                    r.rabhi@atperf.com
                                 </a>
                             </div>
                         </div>

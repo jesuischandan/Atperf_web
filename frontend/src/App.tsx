@@ -20,10 +20,12 @@ import PrivacyPage from './components/PrivacyPage';
 import DiscoverStrAP from './components/DiscoverStrAP';
 import StrapSoftwareMaintenancePage from './components/maintenance/StrapSoftwareMaintenancePage';
 import StrapMaintenanceDemo from './components/maintenance/StrapMaintenanceDemo';
+import ScrollToHash from './components/ScrollToHash';
 
 function App() {
     return (
         <BrowserRouter>
+            <ScrollToHash />
             <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/submit" element={<SubmitForm />} />

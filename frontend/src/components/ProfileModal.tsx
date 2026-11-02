@@ -358,7 +358,7 @@ export default function ProfileModal({ user, onClose, onUpdate }: ProfileModalPr
                                 <div className="absolute top-0 right-0 bg-[#FF6B00] text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-bl-lg">Current Plan</div>
                                 <div className="p-5">
                                     <h3 className="text-2xl font-extrabold text-slate-900 capitalize mb-1">{fullUser.plan_type || 'Free'} Plan</h3>
-                                    <p className="text-sm text-slate-500 mb-6">You are currently enjoying the essential StrAP Tool Suite.</p>
+                                    <p className="text-sm text-slate-500 mb-6">You are currently enjoying the essential STRAP Tool Suite.</p>
                                     
                                     <div className="flex flex-col gap-3">
                                         <button disabled className="w-full py-2.5 rounded-xl bg-slate-100 text-slate-400 font-bold border border-slate-200 cursor-not-allowed">

@@ -12,6 +12,9 @@ async def handle_contact_form(payload: schemas.ContactFormRequest):
     and sends an email to the configured admins.
     """
     subject = f"Contact Form Submission from {payload.name}"
+    # Enquiry topic chosen on the form, e.g. "STRAP Maintenance", leads the subject line.
+    topic = " ".join((payload.topic or "").split())[:80]   # single line: it goes into a mail header
+    prefix = f"[{topic}] " if topic else ""
     
     # Use OpenAI to rewrite the subject if available
     if openai_client.api_key and openai_client.api_key != "your_openai_api_key_here":
@@ -37,13 +40,15 @@ async def handle_contact_form(payload: schemas.ContactFormRequest):
         except Exception as e:
             logger.error(f"OpenAI error during subject generation: {e}")
             
+    subject = prefix + subject
     success = send_contact_email(
         name=payload.name,
         email=payload.email,
         phone=payload.phone or "",
         company=payload.company or "",
         subject=subject,
-        message=payload.message
+        message=payload.message,
+        topic=topic,
     )
     
     if not success:
