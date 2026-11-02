@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, ChevronRight, ClipboardCheck, Database, Search, Settings2, UserCheck, Workflow } from 'lucide-react';
+import { ArrowRight, ChevronRight, ClipboardCheck, Clock, Database, Search, Settings2, UserCheck, Workflow } from 'lucide-react';
+import { MAINTENANCE_DEMO_PUBLIC } from '../../utils/siteConfig';
 import LandingPageNav from '../LandingPageNav';
 import Footer from '../Footer';
 
@@ -12,11 +13,12 @@ import Footer from '../Footer';
 const T = {
     fr: {
         breadcrumb: ['Solutions digitales', 'STRAP Software', 'Maintenance'],
-        status: 'Prototype en développement — pilote industriel recherché',
+        status: 'En développement — démonstrateur interactif prochainement disponible',
+        soon: 'Démonstrateur interactif prochainement disponible',
         hook: 'Et si les Avis de maintenance différés d’aujourd’hui contenaient déjà les signaux des pannes de demain ?',
         promise: 'Anticiper les pannes avant qu’elles ne deviennent des urgences, en exploitant les Avis et OT différés ainsi que les historiques de maintenance.',
         ctaDemo: 'Ouvrir le simulateur',
-        ctaContact: 'Échanger sur un pilote',
+        ctaContact: 'Échanger sur une application STRAP Maintenance',
         contextTitle: 'Des données riches, des signaux encore peu exploités',
         context: 'Les industriels disposent de nombreuses données dans SAP PM et les GMAO : Avis, ordres de travail (OT), historiques d’interventions, rapports et causes de défaillance. Pourtant, certaines anomalies restent en attente ou sont reportées, faute de temps, de ressources ou de critères suffisants pour apprécier leur évolution. STRAP Software Maintenance vise à transformer ces données en décisions d’anticipation pour renforcer la fiabilité des équipements et limiter les arrêts non planifiés.',
         methodTitle: 'La méthode STRAP® : du processus réel à l’anticipation',
@@ -29,11 +31,11 @@ const T = {
         flowsTitle: 'Les trois flux du processus Maintenance',
         flowCols: ['Flux', 'Caractérisation', 'Pilotage', 'Exemple (fictif)'],
         flows: [
-            { key: 'red', name: 'Rouge', what: 'Pannes et urgences ; interventions correctives immédiates', how: 'Réagir et rétablir', ex: 'Perte de pression et arrêt de la pompe hydraulique' },
-            { key: 'green', name: 'Vert', what: 'Préventif et interventions préparées / planifiées', how: 'Exécuter le plan', ex: 'Inspection et graissage selon gamme' },
-            { key: 'yellow', name: 'Jaune', what: 'Avis / OT différés, reportés ou d’opportunité', how: 'Qualifier, prioriser, anticiper', ex: 'Fuite d’huile progressive, contrôle reporté 3 fois' },
+            { key: 'red', name: 'Rouge', what: 'Panne ou défaillance corrective', how: 'Réagir et rétablir', ex: 'Perte de pression et arrêt de la pompe hydraulique' },
+            { key: 'green', name: 'Vert', what: 'Intervention planifiée ou situation maîtrisée', how: 'Exécuter le plan', ex: 'Inspection et graissage selon gamme' },
+            { key: 'yellow', name: 'Jaune', what: 'Avis / OT différé ou opportunité de maintenance nécessitant une évaluation du risque et une décision', how: 'Qualifier, prioriser, anticiper', ex: 'Fuite d’huile progressive, contrôle reporté 3 fois' },
         ],
-        flowsNote: 'Les catégories sont définies selon les critères du processus étudié ; un Avis jaune n’est pas automatiquement annonciateur d’une panne.',
+        flowsNote: 'Ces catégories sont adaptées aux processus de chaque site ; un Avis jaune n’est pas automatiquement annonciateur d’une panne.',
         hypoTitle: 'L’hypothèse JAUNE → ROUGE à tester',
         hypo: 'Certains Avis jaunes anciens ou non traités pourraient présenter des symptômes similaires à ceux qui ont précédé des pannes rouges sur le même équipement ou sous-ensemble. Le prototype rapproche chronologiquement Avis, OT, équipements, symptômes et défaillances, puis permet à un expert de confirmer ou de rejeter les liens suggérés.',
         timeline: [
@@ -88,11 +90,12 @@ const T = {
     },
     en: {
         breadcrumb: ['Digital solutions', 'STRAP Software', 'Maintenance'],
-        status: 'Prototype in development — industrial pilot partner wanted',
+        status: 'In development — interactive demonstrator coming soon',
+        soon: 'Interactive demonstrator coming soon',
         hook: 'What if today’s deferred maintenance notifications already held the signals of tomorrow’s breakdowns?',
         promise: 'Anticipate breakdowns before they become emergencies, by using deferred notifications and work orders together with maintenance history.',
         ctaDemo: 'Open the simulator',
-        ctaContact: 'Discuss a pilot',
+        ctaContact: 'Discuss a STRAP Maintenance application',
         contextTitle: 'Rich data, signals still under-used',
         context: 'Manufacturers hold large amounts of data in SAP PM and CMMS tools: notifications, work orders (WO), intervention history, reports and failure causes. Yet some anomalies stay pending or get postponed, for lack of time, resources or criteria to assess how they evolve. STRAP Software Maintenance aims to turn this data into anticipation decisions that strengthen equipment reliability and limit unplanned stoppages.',
         methodTitle: 'The STRAP® method: from the real process to anticipation',
@@ -105,11 +108,11 @@ const T = {
         flowsTitle: 'The three flows of the maintenance process',
         flowCols: ['Flow', 'Characterisation', 'Management', 'Example (fictive)'],
         flows: [
-            { key: 'red', name: 'Red', what: 'Breakdowns and emergencies; immediate corrective work', how: 'React and restore', ex: 'Pressure loss and hydraulic pump stoppage' },
-            { key: 'green', name: 'Green', what: 'Preventive and prepared / planned work', how: 'Execute the plan', ex: 'Inspection and greasing per routine' },
-            { key: 'yellow', name: 'Yellow', what: 'Deferred, postponed or opportunity notifications / WOs', how: 'Qualify, prioritise, anticipate', ex: 'Progressive oil leak, check postponed 3 times' },
+            { key: 'red', name: 'Red', what: 'Breakdown or corrective failure', how: 'React and restore', ex: 'Pressure loss and hydraulic pump stoppage' },
+            { key: 'green', name: 'Green', what: 'Planned intervention or situation under control', how: 'Execute the plan', ex: 'Inspection and greasing per routine' },
+            { key: 'yellow', name: 'Yellow', what: 'Deferred notification / work order or maintenance opportunity that needs a risk assessment and a decision', how: 'Qualify, prioritise, anticipate', ex: 'Progressive oil leak, check postponed 3 times' },
         ],
-        flowsNote: 'Categories are defined by the criteria of the process studied; a yellow notification is not automatically a breakdown precursor.',
+        flowsNote: 'These categories are adapted to each site’s processes; a yellow notification is not automatically a breakdown precursor.',
         hypoTitle: 'The YELLOW → RED hypothesis to test',
         hypo: 'Some old or untreated yellow notifications may show symptoms similar to those that preceded red breakdowns on the same asset or sub-assembly. The prototype links notifications, work orders, assets, symptoms and failures chronologically, then lets an expert confirm or reject the suggested links.',
         timeline: [
@@ -206,12 +209,14 @@ export default function StrapSoftwareMaintenancePage() {
                         <span className="w-2 h-2 rounded-full bg-[#FF6B00] animate-pulse" /> {t.status}
                     </span>
                     <div className="flex flex-col sm:flex-row gap-4">
-                        <button onClick={() => navigate('/strap-software/maintenance/demo')} className="inline-flex justify-center items-center gap-2 bg-[#FF6B00] hover:bg-[#E66000] text-white font-bold px-8 py-4 rounded-xl shadow-lg shadow-[#FF6B00]/30 transition-all">
-                            {t.ctaDemo} <ArrowRight size={17} />
+                        <button onClick={() => navigate('/contact?topic=maintenance')} className="inline-flex justify-center items-center gap-2 bg-[#FF6B00] hover:bg-[#E66000] text-white font-bold px-8 py-4 rounded-xl shadow-lg shadow-[#FF6B00]/30 transition-all">
+                            {t.ctaContact} <ArrowRight size={17} />
                         </button>
-                        <button onClick={() => navigate('/contact')} className="inline-flex justify-center items-center gap-2 border border-slate-600 text-slate-200 font-semibold px-8 py-4 rounded-xl hover:bg-white/5 transition-all">
-                            {t.ctaContact}
-                        </button>
+                        {MAINTENANCE_DEMO_PUBLIC && (
+                            <button onClick={() => navigate('/strap-software/maintenance/demo')} className="inline-flex justify-center items-center gap-2 border border-slate-600 text-slate-200 font-semibold px-8 py-4 rounded-xl hover:bg-white/5 transition-all">
+                                {t.ctaDemo}
+                            </button>
+                        )}
                     </div>
                 </div>
             </section>
@@ -419,13 +424,18 @@ export default function StrapSoftwareMaintenancePage() {
                     <h2 className="text-2xl sm:text-4xl font-extrabold text-white mb-5 tracking-tight">{t.finalTitle}</h2>
                     <p className="text-slate-400 text-lg mb-10">{t.finalDesc}</p>
                     <div className="flex flex-col sm:flex-row justify-center gap-4">
-                        <button onClick={() => navigate('/contact')} className="inline-flex justify-center items-center gap-2 bg-[#FF6B00] hover:bg-[#E66000] text-white font-bold px-8 py-4 rounded-xl transition-all">
+                        <button onClick={() => navigate('/contact?topic=maintenance')} className="inline-flex justify-center items-center gap-2 bg-[#FF6B00] hover:bg-[#E66000] text-white font-bold px-8 py-4 rounded-xl transition-all">
                             {t.ctaContact} <ArrowRight size={17} />
                         </button>
-                        <button onClick={() => navigate('/strap-software/maintenance/demo')} className="inline-flex justify-center items-center gap-2 border border-slate-600 text-slate-200 font-semibold px-8 py-4 rounded-xl hover:bg-white/5 transition-all">
-                            {t.ctaDemo}
-                        </button>
+                        {MAINTENANCE_DEMO_PUBLIC && (
+                            <button onClick={() => navigate('/strap-software/maintenance/demo')} className="inline-flex justify-center items-center gap-2 border border-slate-600 text-slate-200 font-semibold px-8 py-4 rounded-xl hover:bg-white/5 transition-all">
+                                {t.ctaDemo}
+                            </button>
+                        )}
                     </div>
+                    {!MAINTENANCE_DEMO_PUBLIC && (
+                        <p className="flex justify-center items-center gap-2 text-sm text-slate-400 mt-6"><Clock size={15} className="text-[#FF6B00]" /> {t.soon}</p>
+                    )}
                 </div>
             </section>
 

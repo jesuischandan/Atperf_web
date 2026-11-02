@@ -100,7 +100,7 @@ export default function Dashboard() {
                     setRadarHistory(await radarRes.json());
                 }
 
-                // Fetch StrAP history
+                // Fetch STRAP history
                 const strapUrl = `${API_URL}/api/strap-diagnostics/history?user_id=${currentUser.user_id}&t=${Date.now()}`;
                 const strapRes = await fetch(strapUrl, {
                     cache: 'no-store',
@@ -110,7 +110,7 @@ export default function Dashboard() {
                     setStrapHistory(await strapRes.json());
                 }
 
-                // Fetch StrAPilot history
+                // Fetch STRAPilot history
                 const pilotUrl = `${API_URL}/api/strapilot/history?user_id=${currentUser.user_id}&t=${Date.now()}`;
                 const pilotRes = await fetch(pilotUrl, {
                     cache: 'no-store',
@@ -201,7 +201,7 @@ export default function Dashboard() {
                         reportType: 'strap_analysis',
                         language: 'fr',
                         reportTitle: `Analyse STRAP: ${sessionData.file_name}`,
-                        overallOutcomes: "StrAP Analyse Output"
+                        overallOutcomes: "STRAP Analyse Output"
                     });
                     setIsEmailModalOpen(true);
                 }
@@ -237,7 +237,7 @@ export default function Dashboard() {
                 {/* Title */}
                 <div className="flex items-center gap-3 mb-8">
                     <div className="bg-orange-100 p-2 rounded-xl"><LayoutDashboard size={24} className="text-[#FF6B00]" /></div>
-                    <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Dashboard | StrAP Tools</h1>
+                    <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Dashboard | STRAP Tools</h1>
                 </div>
 
                 {/* Tabs */}
@@ -250,7 +250,7 @@ export default function Dashboard() {
                             }`}
                     >
                         <Activity size={16} />
-                        StrAP Diagnostic
+                        STRAP Diagnostic
                         <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${activeTab === 'strap' ? 'bg-orange-100 text-[#FF6B00]' : 'bg-slate-100 text-slate-500'
                             }`}>{strapHistory.length}</span>
                     </button>
@@ -274,7 +274,7 @@ export default function Dashboard() {
                             }`}
                     >
                         <Brain size={16} />
-                        StrAPilot
+                        STRAPilot
                         <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${activeTab === 'pilot' ? 'bg-orange-100 text-[#FF6B00]' : 'bg-slate-100 text-slate-500'
                             }`}>{pilotHistory.length}</span>
                     </button>
@@ -363,12 +363,12 @@ export default function Dashboard() {
                                 )}
                             </>
                         )}
-                        {/* ======== StrAP Diagnostic Tab ======== */}
+                        {/* ======== STRAP Diagnostic Tab ======== */}
                         {activeTab === 'strap' && (
                             <>
                                 <div className="flex justify-end mb-6">
                                     <button onClick={() => navigate('/tool/strap-diagnosis')} className="bg-[#FF6B00] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#E66000] transition-all flex items-center gap-2 shadow-sm">
-                                        <Plus size={16} /> New StrAP Diagnosis
+                                        <Plus size={16} /> New STRAP Diagnosis
                                     </button>
                                 </div>
 
@@ -378,7 +378,7 @@ export default function Dashboard() {
                                             <Activity size={24} className="text-slate-400" />
                                         </div>
                                         <h2 className="text-xl font-bold text-slate-900 mb-2">Pas encore de diagnostic</h2>
-                                        <p className="text-slate-500 mb-8 max-w-md mx-auto">Évaluez vos pertes invisibles avec le diagnostic StrAP.</p>
+                                        <p className="text-slate-500 mb-8 max-w-md mx-auto">Évaluez vos pertes invisibles avec le diagnostic STRAP.</p>
                                         <button onClick={() => navigate('/tool/strap-diagnosis')} className="bg-[#FF6B00] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#E66000] transition-all inline-flex items-center gap-2 shadow-lg shadow-[#FF6B00]/20">
                                             <Activity size={18} /> Démarrer le Diagnostic
                                         </button>
@@ -417,18 +417,18 @@ export default function Dashboard() {
                                 )}
                             </>
                         )}
-                        {/* ======== StrAPilot Tab ======== */}
+                        {/* ======== STRAPilot Tab ======== */}
                         {activeTab === 'pilot' && (
                             <>
                                 <div className="flex justify-end mb-6">
                                     <button onClick={() => navigate('/tool/strapilot/app')} className="bg-[#FF6B00] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#E66000] transition-all flex items-center gap-2 shadow-sm">
-                                        <Plus size={16} /> New StrAPilot Dashboard
+                                        <Plus size={16} /> New STRAPilot Dashboard
                                     </button>
                                 </div>
 
                                 {pilotHistory.length === 0 ? (
                                     <div className="border-2 border-dashed border-slate-200 rounded-3xl p-16 text-center max-w-2xl mx-auto bg-white/50">
-                                        <h2 className="text-xl font-bold text-slate-900 mb-2">No StrAPilot sessions yet</h2>
+                                        <h2 className="text-xl font-bold text-slate-900 mb-2">No STRAPilot sessions yet</h2>
                                         <p className="text-slate-500 mb-8 max-w-md mx-auto">Upload your data and let AI generate KPIs for you.</p>
                                         <button onClick={() => navigate('/tool/strapilot/app')} className="bg-[#FF6B00] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#E66000] transition-all inline-flex items-center gap-2 shadow-lg shadow-[#FF6B00]/20">
                                             Start AI Analysis
@@ -624,13 +624,13 @@ export default function Dashboard() {
                 </div>
             )}
 
-            {/* StrAP Detail Modal */}
+            {/* STRAP Detail Modal */}
             {selectedStrap && (
                 <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/40 px-4">
                     <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-slate-200">
                         <div className="flex items-start justify-between px-6 py-4 border-b border-slate-200">
                             <div>
-                                <p className="text-xs font-bold uppercase text-slate-400 mb-1">Diagnostic StrAP</p>
+                                <p className="text-xs font-bold uppercase text-slate-400 mb-1">Diagnostic STRAP</p>
                                 <h2 className="text-xl font-extrabold text-slate-900 leading-snug">{selectedStrap.category_result}</h2>
                                 <p className="text-xs text-slate-500 mt-1">
                                     {new Date(selectedStrap.created_at).toLocaleString()}
@@ -648,7 +648,7 @@ export default function Dashboard() {
                                                     filename: pdfResult.filename,
                                                     reportType: 'strap',
                                                     language: 'fr',
-                                                    reportTitle: 'Diagnostic StrAP',
+                                                    reportTitle: 'Diagnostic STRAP',
                                                     overallOutcomes: selectedStrap.category_result
                                                 });
                                                 setIsEmailModalOpen(true);
@@ -720,14 +720,14 @@ export default function Dashboard() {
                 </div>
             )}
 
-            {/* StrAPilot Detail Modal */}
+            {/* STRAPilot Detail Modal */}
             {selectedPilot && (selectedPilot.dashboard_payload || selectedPilot.strap_analysis_payload) && (
                 <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/40 px-4">
                     <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-slate-200">
                         <div className="flex items-start justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white z-10">
                             <div>
                                 <p className="text-xs font-bold uppercase text-slate-400 mb-1">
-                                    {selectedPilot.analysis_mode === 'strap_analysis' ? 'Analyse STRAP' : 'StrAPilot Dashboard'}
+                                    {selectedPilot.analysis_mode === 'strap_analysis' ? 'Analyse STRAP' : 'STRAPilot Dashboard'}
                                 </p>
                                 <h2 className="text-xl font-extrabold text-slate-900 leading-snug">{selectedPilot.file_name}</h2>
                             </div>

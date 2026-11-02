@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, ArrowLeft, CheckCircle2, Info, RotateCcw, SlidersHorizontal, XCircle, PencilLine } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, CheckCircle2, Info, RotateCcw, SlidersHorizontal } from 'lucide-react';
 import LandingPageNav from '../LandingPageNav';
 import Footer from '../Footer';
 import { useLang } from '../../utils/useLang';
@@ -10,22 +10,26 @@ import {
     metrics, precursors, redWorkOrders, scoreAll, weightsTotal,
     type Criterion, type PriorityClass, type ScoredNotice, type Thresholds, type Weights,
 } from './scoring';
+import ActionEditor from './demo/ActionEditor';
+import ActionsTab from './demo/ActionsTab';
+import KpisTab from './demo/KpisTab';
+import { STATUS_LABEL, STATUS_STYLE, loadActions, resetActions, saveActions, type DemoAction } from './demo/actions';
 
 /* ─────────────────────────────────────────────────────────────
    STRAP Software Maintenance — public simulator on fictive data
 ───────────────────────────────────────────────────────────── */
 
 type Lang = 'en' | 'fr';
-type Tab = 'overview' | 'yellows' | 'replay' | 'measure';
-type Decision = { status: 'validated' | 'rejected' | 'corrected'; comment: string };
+type Tab = 'overview' | 'yellows' | 'actions' | 'replay' | 'measure' | 'kpis';
 
 const T = {
     fr: {
         back: 'STRAP Software Maintenance',
         title: 'Simulateur STRAP Software Maintenance',
         subtitle: 'Rejouez l’hypothèse JAUNE → ROUGE sur un jeu de données de maintenance entièrement fictif.',
-        banner: 'Démonstrateur sur données 100 % fictives (12 équipements, 102 Avis, 48 OT). Pas de connexion SAP, pas de création d’OT, pas d’IA : les notes 0–5 proviennent du jeu de test, seules les pondérations et les seuils sont ajustables. Un Avis jaune antérieur ne prouve pas qu’il a causé la panne.',
-        tabs: { overview: 'Vue d’ensemble', yellows: 'Avis jaunes priorisés', replay: 'Rejeu d’une panne', measure: 'Mesure des alertes' } as Record<Tab, string>,
+        label: 'Démonstrateur utilisant des données illustratives. Les règles et résultats ne constituent pas une validation prédictive sur un site industriel.',
+        banner: '12 équipements, 102 Avis, 48 OT. Pas de connexion SAP, pas de création d’OT, pas d’IA : les notes 0–5 proviennent du jeu illustratif, seules les pondérations et les seuils sont ajustables. Un Avis jaune antérieur ne prouve pas qu’il a causé la panne.',
+        tabs: { overview: 'Vue d’ensemble', yellows: 'Avis jaunes priorisés', actions: 'Suivi des actions', replay: 'Rejeu d’une panne', measure: 'Mesure des alertes', kpis: 'Indicateurs' } as Record<Tab, string>,
         params: 'Paramètres de la matrice',
         total: 'Total',
         totalWarn: 'Les pondérations doivent totaliser 100.',
@@ -55,13 +59,6 @@ const T = {
         datasetLinks: 'Rapprochements enregistrés',
         checks: 'Vérifications suggérées',
         checksNote: 'À confirmer par un responsable Maintenance — aucun OT n’est créé automatiquement.',
-        expert: 'Décision de l’expert Maintenance',
-        validate: 'Valider la priorité',
-        reject: 'Rejeter',
-        correct: 'Corriger',
-        comment: 'Commentaire (optionnel)',
-        decisionNote: 'Démo : les décisions restent dans votre navigateur et ne sont pas enregistrées.',
-        decisions: { validated: 'Priorité validée', rejected: 'Rejeté par l’expert', corrected: 'Corrigé par l’expert' },
         replayPick: 'Choisir une panne rouge historique',
         withPre: 'Pannes avec Avis jaune précurseur',
         withoutPre: 'Pannes sans précurseur sur l’équipement',
@@ -72,6 +69,7 @@ const T = {
         flaggedYes: 'Oui',
         flaggedNo: 'Non',
         autoCandidate: 'Candidat automatique (même équipement)',
+        subCandidate: 'Candidat automatique (même sous-ensemble)',
         otherEq: 'autre équipement',
         verdictOk: (d: number) => `La matrice aurait signalé un Avis jaune ${d} jours avant la panne (seuil haut).`,
         verdictLow: 'Des Avis jaunes précèdent la panne, mais aucun n’atteint le seuil haut : à analyser avec l’expert (critères ou pondérations).',
@@ -84,15 +82,16 @@ const T = {
         falseList: 'Alertes non suivies d’une panne dans l’horizon',
         caution: 'Le score exprime une priorité métier, pas une probabilité de panne. L’absence de panne ultérieure ne signifie pas l’absence de risque : l’Avis a pu être traité à temps.',
         ctaTitle: 'Vous disposez d’historiques d’Avis et d’OT ?',
-        ctaDesc: 'Échangeons sur un pilote STRAP Maintenance afin d’évaluer les liens entre anomalies différées et défaillances historiques sur vos propres données.',
-        ctaBtn: 'Échanger sur un pilote',
+        ctaDesc: 'Échangeons sur une application STRAP Maintenance afin d’évaluer les liens entre anomalies différées et défaillances historiques sur vos propres données.',
+        ctaBtn: 'Échanger sur une application STRAP Maintenance',
     },
     en: {
         back: 'STRAP Software Maintenance',
         title: 'STRAP Software Maintenance simulator',
         subtitle: 'Replay the YELLOW → RED hypothesis on an entirely fictive maintenance dataset.',
-        banner: 'Demonstrator on 100% fictive data (12 assets, 102 notifications, 48 work orders). No SAP connection, no automatic work orders, no AI: the 0–5 notes come from the test dataset, only weights and thresholds are adjustable. An earlier yellow notification does not prove it caused the breakdown. Dataset labels are in French.',
-        tabs: { overview: 'Overview', yellows: 'Prioritised yellows', replay: 'Replay a breakdown', measure: 'Alert measurement' } as Record<Tab, string>,
+        label: 'Demonstrator using illustrative data. The rules and results do not constitute a predictive validation on an industrial site.',
+        banner: '12 assets, 102 notifications, 48 work orders. No SAP connection, no automatic work orders, no AI: the 0–5 notes come from the illustrative dataset, only weights and thresholds are adjustable. An earlier yellow notification does not prove it caused the breakdown. Dataset labels are in French.',
+        tabs: { overview: 'Overview', yellows: 'Prioritised yellows', actions: 'Action follow-up', replay: 'Replay a breakdown', measure: 'Alert measurement', kpis: 'Indicators' } as Record<Tab, string>,
         params: 'Matrix parameters',
         total: 'Total',
         totalWarn: 'Weights must add up to 100.',
@@ -122,13 +121,6 @@ const T = {
         datasetLinks: 'Recorded matches',
         checks: 'Suggested checks',
         checksNote: 'To be confirmed by a maintenance manager — no work order is created automatically.',
-        expert: 'Maintenance expert decision',
-        validate: 'Validate priority',
-        reject: 'Reject',
-        correct: 'Correct',
-        comment: 'Comment (optional)',
-        decisionNote: 'Demo: decisions stay in your browser and are not saved.',
-        decisions: { validated: 'Priority validated', rejected: 'Rejected by expert', corrected: 'Corrected by expert' },
         replayPick: 'Pick a historical red breakdown',
         withPre: 'Breakdowns with a yellow precursor',
         withoutPre: 'Breakdowns with no precursor on the asset',
@@ -139,6 +131,7 @@ const T = {
         flaggedYes: 'Yes',
         flaggedNo: 'No',
         autoCandidate: 'Automatic candidate (same asset)',
+        subCandidate: 'Automatic candidate (same sub-assembly)',
         otherEq: 'other asset',
         verdictOk: (d: number) => `The matrix would have flagged a yellow notification ${d} days before the breakdown (high threshold).`,
         verdictLow: 'Yellow notifications precede the breakdown but none reaches the high threshold: review criteria or weights with the expert.',
@@ -151,8 +144,8 @@ const T = {
         falseList: 'Alerts not followed by a breakdown within the horizon',
         caution: 'The score is a business priority, not a failure probability. No later breakdown does not mean no risk: the notification may have been handled in time.',
         ctaTitle: 'Do you have notification and work-order history?',
-        ctaDesc: 'Let’s discuss a STRAP Maintenance pilot to assess the links between deferred anomalies and past failures on your own data.',
-        ctaBtn: 'Discuss a pilot',
+        ctaDesc: 'Let’s discuss a STRAP Maintenance application to assess the links between deferred anomalies and past failures on your own data.',
+        ctaBtn: 'Discuss a STRAP Maintenance application',
     },
 };
 
@@ -207,8 +200,8 @@ export default function StrapMaintenanceDemo() {
     const [openOnly, setOpenOnly] = useState(false);
     const [query, setQuery] = useState('');
     const [selectedId, setSelectedId] = useState<string | null>(null);
-    const [decisions, setDecisions] = useState<Record<string, Decision>>({});
-    const [draftComment, setDraftComment] = useState('');
+    const [actions, setActions] = useState<Record<string, DemoAction>>(loadActions);
+    const saveAction = (a: DemoAction) => setActions(prev => { const next = { ...prev, [a.noticeId]: a }; saveActions(next); return next; });
 
     const scored = useMemo(() => scoreAll(weights, thresholds), [weights, thresholds]);
     const total = weightsTotal(weights);
@@ -248,11 +241,7 @@ export default function StrapMaintenanceDemo() {
         return o.equipmentId === n.equipmentId && lead > 0 && lead <= horizon;
     }));
 
-    const openNotice = (id: string) => { setSelectedId(id); setDraftComment(decisions[id]?.comment ?? ''); setTab('yellows'); };
-    const decide = (status: Decision['status']) => {
-        if (!selected) return;
-        setDecisions(d => ({ ...d, [selected.id]: { status, comment: draftComment } }));
-    };
+    const openNotice = (id: string) => { setSelectedId(id); setTab('yellows'); };
 
     const allDates = [...DATA.notices.map(n => n.date), ...DATA.workOrders.map(o => o.date)].sort();
     const range = { start: shiftDays(allDates[0], -10), end: shiftDays(allDates[allDates.length - 1], 10) };
@@ -269,9 +258,12 @@ export default function StrapMaintenanceDemo() {
                     <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight mb-2">{t.title}</h1>
                     <p className="text-slate-500 text-base sm:text-lg mb-6">{t.subtitle}</p>
 
-                    <div className="flex gap-3 items-start bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-900 mb-6">
+                    <div className="flex gap-3 items-start bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-900 mb-6" role="note">
                         <Info size={18} className="shrink-0 mt-0.5" />
-                        <p>{t.banner}</p>
+                        <div>
+                            <p className="font-bold">{t.label}</p>
+                            <p className="mt-1">{t.banner}</p>
+                        </div>
                     </div>
 
                     {/* Parameters */}
@@ -380,14 +372,14 @@ export default function StrapMaintenanceDemo() {
                                         <tbody>
                                             {filtered.map(n => {
                                                 const e = equipmentById.get(n.equipmentId)!;
-                                                const d = decisions[n.id];
+                                                const a = actions[n.id];
                                                 return (
                                                     <tr key={n.id} onClick={() => openNotice(n.id)}
                                                         className={`border-t border-slate-100 cursor-pointer hover:bg-orange-50/50 ${selectedId === n.id ? 'bg-orange-50' : ''}`}>
                                                         <td className="px-3 py-2 text-slate-400 tabular-nums">{scored.indexOf(n) + 1}</td>
                                                         <td className="px-3 py-2 font-semibold whitespace-nowrap">
                                                             {n.id}
-                                                            {d && (d.status === 'validated' ? <CheckCircle2 size={13} className="inline ml-1 text-emerald-600" /> : d.status === 'rejected' ? <XCircle size={13} className="inline ml-1 text-red-500" /> : <PencilLine size={13} className="inline ml-1 text-slate-500" />)}
+                                                            {a && <span className={`ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded ${STATUS_STYLE[a.status]}`} title={STATUS_LABEL[lang][a.status]}>{STATUS_LABEL[lang][a.status]}</span>}
                                                         </td>
                                                         <td className="px-3 py-2 whitespace-nowrap text-slate-600">{n.date}</td>
                                                         <td className="px-3 py-2 whitespace-nowrap">{e.tag}</td>
@@ -408,10 +400,7 @@ export default function StrapMaintenanceDemo() {
                                 {!selected ? (
                                     <div className="border border-dashed border-slate-300 rounded-xl p-8 text-center text-slate-500 text-sm">{t.selectHint}</div>
                                 ) : (
-                                    <NoticeDetail
-                                        n={selected} lang={lang} weights={weights} decision={decisions[selected.id]}
-                                        comment={draftComment} onComment={setDraftComment} onDecide={decide}
-                                    />
+                                    <NoticeDetail n={selected} lang={lang} weights={weights} action={actions[selected.id]} onSaveAction={saveAction} />
                                 )}
                             </aside>
                         </div>
@@ -479,7 +468,7 @@ export default function StrapMaintenanceDemo() {
                                                 <td className="px-3 py-2 text-slate-600">{p.notice.symptom}</td>
                                                 <td className="px-3 py-2"><ScoreBar value={p.notice.score} priority={p.notice.priority} /></td>
                                                 <td className="px-3 py-2">{p.flagged ? <span className="font-semibold text-emerald-700">{t.flaggedYes}</span> : <span className="text-slate-500">{t.flaggedNo}</span>}</td>
-                                                <td className="px-3 py-2 text-xs text-slate-600">{p.linkStatus ?? t.autoCandidate}</td>
+                                                <td className="px-3 py-2 text-xs text-slate-600">{p.linkStatus ?? (p.sameEquipment ? t.autoCandidate : t.subCandidate)}</td>
                                             </tr>
                                         ))}
                                         {pre.length === 0 && <tr><td colSpan={8} className="px-3 py-8 text-center text-slate-500">{t.verdictNone}</td></tr>}
@@ -542,13 +531,23 @@ export default function StrapMaintenanceDemo() {
                         </div>
                     )}
 
+                    {/* ── Action follow-up ── */}
+                    {tab === 'actions' && (
+                        <ActionsTab lang={lang} actions={actions} scored={scored} onOpen={openNotice} onReset={() => setActions(resetActions())} />
+                    )}
+
+                    {/* ── Indicators ── */}
+                    {tab === 'kpis' && (
+                        <KpisTab lang={lang} scored={scored} actions={actions} windowDays={horizon} onWindow={setHorizon} />
+                    )}
+
                     {/* CTA */}
                     <div className="mt-14 rounded-2xl bg-slate-900 text-white p-8 sm:p-10 flex flex-col md:flex-row md:items-center gap-6 justify-between">
                         <div className="max-w-2xl">
                             <h2 className="text-xl sm:text-2xl font-extrabold mb-2">{t.ctaTitle}</h2>
                             <p className="text-slate-400">{t.ctaDesc}</p>
                         </div>
-                        <button onClick={() => navigate('/contact')} className="shrink-0 bg-[#FF6B00] hover:bg-[#E66000] text-white font-bold px-7 py-3.5 rounded-xl transition-all">
+                        <button onClick={() => navigate('/contact?topic=maintenance')} className="shrink-0 bg-[#FF6B00] hover:bg-[#E66000] text-white font-bold px-7 py-3.5 rounded-xl transition-all">
                             {t.ctaBtn}
                         </button>
                     </div>
@@ -563,9 +562,8 @@ export default function StrapMaintenanceDemo() {
 /* ─────────────────────────────────────────────────────────────
    Detail panel for one yellow notification
 ───────────────────────────────────────────────────────────── */
-function NoticeDetail({ n, lang, weights, decision, comment, onComment, onDecide }: {
-    n: ScoredNotice; lang: Lang; weights: Weights; decision?: Decision;
-    comment: string; onComment: (s: string) => void; onDecide: (s: Decision['status']) => void;
+function NoticeDetail({ n, lang, weights, action, onSaveAction }: {
+    n: ScoredNotice; lang: Lang; weights: Weights; action?: DemoAction; onSaveAction: (a: DemoAction) => void;
 }) {
     const t = T[lang];
     const e = equipmentById.get(n.equipmentId)!;
@@ -640,18 +638,7 @@ function NoticeDetail({ n, lang, weights, decision, comment, onComment, onDecide
                 </div>
             )}
 
-            <div>
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">{t.expert}</h4>
-                {decision && <p className="text-sm font-semibold text-slate-800 mb-2">✓ {t.decisions[decision.status]}{decision.comment && ` — « ${decision.comment} »`}</p>}
-                <textarea value={comment} onChange={ev => onComment(ev.target.value)} placeholder={t.comment} rows={2}
-                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm mb-2" />
-                <div className="flex flex-wrap gap-2">
-                    <button onClick={() => onDecide('validated')} className="inline-flex items-center gap-1.5 text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg px-3 py-2"><CheckCircle2 size={15} /> {t.validate}</button>
-                    <button onClick={() => onDecide('rejected')} className="inline-flex items-center gap-1.5 text-sm font-semibold border border-slate-200 hover:bg-slate-50 rounded-lg px-3 py-2"><XCircle size={15} /> {t.reject}</button>
-                    <button onClick={() => onDecide('corrected')} className="inline-flex items-center gap-1.5 text-sm font-semibold border border-slate-200 hover:bg-slate-50 rounded-lg px-3 py-2"><PencilLine size={15} /> {t.correct}</button>
-                </div>
-                <p className="text-xs text-slate-500 mt-2">{t.decisionNote}</p>
-            </div>
+            <ActionEditor noticeId={n.id} lang={lang} value={action} suggestion={check?.[lang]} onSave={onSaveAction} />
         </div>
     );
 }

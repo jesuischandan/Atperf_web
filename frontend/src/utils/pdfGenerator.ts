@@ -266,7 +266,7 @@ export const generateStrapDiagPDF = async (diagnostic: any, returnBase64: boolea
     };
 
     // Header
-    addText("Diagnostic StrAP - Résultat", 18, true, [15, 23, 42]);
+    addText("Diagnostic STRAP - Résultat", 18, true, [15, 23, 42]);
     y += 4;
     
     addText(`Date: ${new Date(diagnostic.created_at || Date.now()).toLocaleString()}`, 10, false, [100, 116, 139]);
@@ -312,7 +312,7 @@ export const generateStrapDiagPDF = async (diagnostic: any, returnBase64: boolea
     });
 
     const dateStr = new Date(diagnostic.created_at || Date.now()).toISOString().split('T')[0];
-    const filename = `Diagnostic_StrAP_${dateStr}.pdf`;
+    const filename = `Diagnostic_STRAP_${dateStr}.pdf`;
     
     await addHeaderAndFooter(doc);
 
@@ -350,7 +350,7 @@ export const generateStrapilotPDF = async (sessionData: any, returnBase64: boole
     };
 
     // Header
-    addText("StrAPilot - AI Analytics Dashboard", 18, true, [15, 23, 42]);
+    addText("STRAPilot - AI Analytics Dashboard", 18, true, [15, 23, 42]);
     y += 4;
     addText(`Date: ${new Date(sessionData.created_at || Date.now()).toLocaleString()} | File: ${sessionData.file_name || 'Dataset'}`, 10, false, [100, 116, 139]);
     y += 8;
@@ -422,7 +422,7 @@ export const generateStrapilotPDF = async (sessionData: any, returnBase64: boole
     }
 
     const dateStr = new Date(sessionData.created_at || Date.now()).toISOString().split('T')[0];
-    const filename = `StrAPilot_Dashboard_${dateStr}.pdf`;
+    const filename = `STRAPilot_Dashboard_${dateStr}.pdf`;
     
     // @ts-ignore
     await addHeaderAndFooter(doc);
@@ -542,7 +542,7 @@ export const generateStrapAnalysisPDF = async (sessionData: any, returnBase64: b
     }
 
     const dateStr = new Date(sessionData.created_at || Date.now()).toISOString().split('T')[0];
-    const filename = `StrAPilot_Analyse_${dateStr}.pdf`;
+    const filename = `STRAPilot_Analyse_${dateStr}.pdf`;
     
     await addHeaderAndFooter(doc);
 

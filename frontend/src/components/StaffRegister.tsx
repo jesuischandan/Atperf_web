@@ -127,7 +127,7 @@ export default function StaffRegister() {
                     </button>
                     <div className="flex items-center gap-2">
                         <div className="bg-indigo-600 p-1.5 rounded-lg"><Zap size={16} className="fill-white" /></div>
-                        <span className="font-bold text-slate-900 tracking-tight">StrAP Tools</span>
+                        <span className="font-bold text-slate-900 tracking-tight">STRAP Tools</span>
                     </div>
                     <div />
                 </nav>
@@ -179,7 +179,7 @@ export default function StaffRegister() {
                 </button>
                 <div className="flex items-center gap-2">
                     <div className="bg-indigo-600 p-1.5 rounded-lg"><Zap size={16} className="fill-white" /></div>
-                    <span className="font-bold text-slate-900 tracking-tight">StrAP Tools</span>
+                    <span className="font-bold text-slate-900 tracking-tight">STRAP Tools</span>
                 </div>
                 <div />
             </nav>

@@ -440,6 +440,10 @@ const Strapilot = () => {
                 }} className="flex items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors text-sm font-medium">
                     <ArrowLeft size={16} /> {t.back}
                 </button>
+                <div className="flex items-center gap-2">
+                    <div className="bg-[#FF6B00] p-1.5 rounded-lg"><Bot size={16} className="text-white" /></div>
+                    <span className="font-bold text-slate-900 tracking-tight hidden sm:block">STRAPilot</span>
+                </div>
                 <div className="text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
                     {t.stepStr} {step}
                 </div>
