@@ -1,7 +1,7 @@
 import { Brain, Bot, LayoutDashboard, Navigation, ShieldCheck, Wrench, type LucideIcon } from 'lucide-react';
 
 /* ─────────────────────────────────────────────────────────────
-   StrAP tools sidebar entries. Adding a tool = adding one entry here.
+   STRAP tools sidebar entries. Adding a tool = adding one entry here.
 ───────────────────────────────────────────────────────────── */
 
 export interface NavContext {
@@ -33,7 +33,7 @@ export const TOOLS_NAV: NavItem[] = [
         key: 'diagnostic',
         path: '/submit',
         icon: Brain,
-        label: { en: 'StrAP Perf Diagnostic', fr: 'Diagnostic StrAP Perf' },
+        label: { en: 'STRAP Perf Diagnostic', fr: 'Diagnostic STRAP Perf' },
     },
     {
         key: 'radar',
@@ -45,7 +45,7 @@ export const TOOLS_NAV: NavItem[] = [
         key: 'strapilot',
         path: '/tool/strapilot/app',
         icon: Bot,
-        label: { en: 'StrAPilot', fr: 'StrAPilot' },
+        label: { en: 'STRAPilot', fr: 'STRAPilot' },
     },
     {
         key: 'maintenance',

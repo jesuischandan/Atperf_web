@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, AlertTriangle, Lightbulb, TrendingUp, Zap, ChevronRight } from 'lucide-react';
+import { ArrowRight, AlertTriangle, Lightbulb, TrendingUp, Zap, ChevronRight, Search, Settings2, MonitorSmartphone, Factory, CheckCircle2 } from 'lucide-react';
 import LandingPageNav from './LandingPageNav';
 import Footer from './Footer';
 import StrapMaintenanceSection from './maintenance/StrapMaintenanceSection';
@@ -26,18 +26,18 @@ const T = {
         ],
         problemResultTitle: 'Result:',
         problemResultList: [
-            '10 to 30% of invisible losses',
+            'Invisible losses, often significant',
             'Permanent instability',
         ],
 
         // Revelation
         revelationTitle: 'The Revelation',
-        revelationQuote: 'Every problem was visible before it existed.',
-        revelationDesc: 'StrAP is built on a founding principle:',
-        revelationPrinciple: 'every malfunction is preceded by weak signals.',
+        revelationQuote: 'Many industrial deviations leave clues before they produce their consequences.',
+        revelationDesc: 'STRAP is built on a founding principle:',
+        revelationPrinciple: 'most deviations are preceded by observable signals — provided you know how to characterise them.',
 
         // Method
-        methodTitle: 'The StrAP® Method',
+        methodTitle: 'The STRAP® Method',
         methodSubtitle: 'A structured, repeatable approach to master operational performance.',
         steps: [
             {
@@ -68,29 +68,29 @@ const T = {
         ],
 
         // Demo
-        demoTitle: 'See StrAP in Action',
+        demoTitle: 'See STRAP in Action',
         demoSubtitle: 'Discover the power of our platform in this short demonstration.',
 
         // Offers
-        offersTitle: 'StrAP Offers',
+        offersTitle: 'STRAP Offers',
         offersSubtitle: 'Choose your entry point',
         offers: [
             {
-                name: 'StrAP Scan',
+                name: 'STRAP Scan',
                 tag: 'Identify your losses',
-                desc: 'A rapid diagnostic to map your invisible performance gaps and quantify what you stand to recover.',
+                desc: 'Diagnosis of losses and risks: we map your key processes, the situations that generate losses and the data available to characterise them.',
                 highlight: false,
             },
             {
-                name: 'StrAP Deploy',
+                name: 'STRAP Deploy',
                 tag: 'Activate the levers',
-                desc: 'Operational deployment of the StrAP method—structured, measurable, and anchored in your teams.',
+                desc: 'Business rules, workflows, indicators and decision routines built and deployed with your teams.',
                 highlight: true,
             },
             {
-                name: 'StrAP Scale',
+                name: 'STRAP Scale',
                 tag: 'Deploy at scale',
-                desc: 'Roll out StrAP across multiple sites or business units and build a lasting culture of anticipation.',
+                desc: 'Extension to several processes, workshops or sites, to build a lasting culture of anticipation.',
                 highlight: false,
             },
         ],
@@ -98,16 +98,45 @@ const T = {
         // Impact
         impactTitle: 'Measurable Impact',
         impactList: [
-            '+20 to +30% performance gains',
+            'Gains measured on your own indicators',
             'Rapid results, visible in the field',
             'Accelerated decision-making',
         ],
 
         // CTA
         ctaTitle: 'Ready to diagnose your performance?',
-        ctaDesc: 'In less than 15 minutes, the StrAP diagnosis identifies your top performance leaks.',
-        ctaBtn: 'Run the StrAP® diagnostic',
+        ctaDesc: 'In less than 15 minutes, the STRAP diagnosis identifies your top performance leaks.',
+        ctaBtn: 'Run the STRAP® diagnostic',
         ctaSecondary: 'Book a call',
+
+        // How it works (AS IS → TO BE → DIGITALISATION)
+        howTag: 'How it works',
+        howTitle: 'How does STRAP® work in practice?',
+        howSubtitle: 'A structured approach in three phases, from field diagnosis to operational anticipation.',
+        howSteps: [
+            { title: 'AS IS', desc: 'We map the key industrial processes, their flows, anomalies and management practices. We identify the situations that generate losses, the causes of deviations and the data available to characterise them.' },
+            { title: 'TO BE', desc: 'With your teams, we define risk criteria, business rules, alert thresholds and the actions to take. Depending on the process, situations can be characterised as red, yellow and green flows: actual incidents, risks and situations under control.' },
+            { title: 'DIGITALISATION', desc: 'We digitalise the anticipation rules, alerts, indicators and decision routines. STRAP Software makes risks, priorities and action follow-up visible, building on existing systems wherever possible.' },
+        ],
+        howClosing: 'STRAP® does not start with software. It starts with understanding the industrial process and the decisions to anticipate.',
+        termsTitle: 'Four names, one approach',
+        terms: [
+            { name: 'STRAP®', desc: 'The method: Strict Anticipation Process.' },
+            { name: 'STRAP Software', desc: 'Its digital implementation on your site: rules, alerts, indicators and routines.' },
+            { name: 'STRAP Tools', desc: 'Online tools to get started: performance diagnostic, Decision Radar, STRAPilot.' },
+            { name: 'STRAP Maintenance', desc: 'An application of STRAP Software to the maintenance process — in development.' },
+        ],
+
+        // Aperam case
+        caseTag: 'STRAP® in action — Aperam Imphy',
+        caseTitle: 'Anticipating raw-material non-conformities before they are used in the steel plant.',
+        caseChallengeTitle: 'Challenge',
+        caseChallenge: 'Anomalies in reception, conformity or certificates discovered late could cause major losses.',
+        caseApproachTitle: 'Approach',
+        caseApproach: ['Characterisation of anomalies', 'Compliance business rules', 'Digital reception and certificate workflow', 'Updated conformity KPIs', 'Daily operational routines'],
+        caseResultTitle: 'Result',
+        caseResult: 'No new raw-material scrap recorded since mid-November 2023 on the monitored scope, according to project results.',
+        caseNote: 'Result on the raw-materials process — not a STRAP Maintenance result.',
     },
     fr: {
         heroTitle: 'STRAP',
@@ -124,16 +153,16 @@ const T = {
         ],
         problemResultTitle: 'Résultat :',
         problemResultList: [
-            '10 à 30% de pertes invisibles',
+            'Des pertes invisibles, souvent significatives',
             'Instabilité permanente',
         ],
 
         revelationTitle: 'La Révélation',
-        revelationQuote: `Chaque problème était visible avant d’exister.`,
-        revelationDesc: 'StrAP repose sur un principe fondateur :',
-        revelationPrinciple: 'tout dysfonctionnement est précédé de signaux faibles.',
+        revelationQuote: `De nombreuses dérives industrielles laissent des indices avant de produire leurs conséquences.`,
+        revelationDesc: 'STRAP repose sur un principe fondateur :',
+        revelationPrinciple: 'la plupart des dérives sont précédées de signaux observables — encore faut-il savoir les caractériser.',
 
-        methodTitle: 'La Méthode StrAP®',
+        methodTitle: 'La Méthode STRAP®',
         methodSubtitle: `Une approche structurée et reproductible pour maîtriser la performance opérationnelle.`,
         steps: [
             {
@@ -163,43 +192,70 @@ const T = {
             },
         ],
 
-        demoTitle: 'Voir StrAP en Action',
+        demoTitle: 'Voir STRAP en Action',
         demoSubtitle: 'Découvrez la puissance de notre plateforme dans cette courte démonstration.',
 
-        offersTitle: 'Offres StrAP',
+        offersTitle: 'Offres STRAP',
         offersSubtitle: `Choisissez votre point d’entrée`,
         offers: [
             {
-                name: 'StrAP Scan',
+                name: 'STRAP Scan',
                 tag: 'Identifier vos pertes',
-                desc: 'Un diagnostic rapide pour cartographier vos pertes de performance invisibles et quantifier ce que vous pouvez récupérer.',
+                desc: 'Diagnostic des pertes et des risques : nous cartographions vos processus clés, les situations génératrices de pertes et les données permettant de les caractériser.',
                 highlight: false,
             },
             {
-                name: 'StrAP Deploy',
+                name: 'STRAP Deploy',
                 tag: 'Activer les leviers',
-                desc: `Déploiement opérationnel de la méthode StrAP—structuré, mesurable et ancré dans vos équipes.`,
+                desc: `Règles métier, workflows, indicateurs et routines de décision construits et déployés avec vos équipes.`,
                 highlight: true,
             },
             {
-                name: 'StrAP Scale',
+                name: 'STRAP Scale',
                 tag: 'Déployer à grande échelle',
-                desc: `Déployer StrAP sur plusieurs sites ou business units et construire une culture durable d’anticipation.`,
+                desc: `Extension à plusieurs processus, ateliers ou sites, pour ancrer durablement une culture d’anticipation.`,
                 highlight: false,
             },
         ],
 
         impactTitle: 'Impact Mesurable',
         impactList: [
-            '+20 à +30% de gains de performance',
+            'Des gains mesurés sur vos propres indicateurs',
             'Résultats rapides, visibles sur le terrain',
             'Décisions accélérées',
         ],
 
         ctaTitle: 'Prêt à diagnostiquer votre performance ?',
-        ctaDesc: 'En moins de 15 minutes, le diagnostic StrAP identifie vos principales fuites de performance.',
-        ctaBtn: 'Faire le diagnostic StrAP®',
+        ctaDesc: 'En moins de 15 minutes, le diagnostic STRAP identifie vos principales fuites de performance.',
+        ctaBtn: 'Faire le diagnostic STRAP®',
         ctaSecondary: 'Prendre un rendez-vous',
+
+        howTag: 'Comment ça marche',
+        howTitle: 'Comment fonctionne concrètement STRAP® ?',
+        howSubtitle: 'Une démarche structurée en trois phases, du diagnostic terrain à l’anticipation opérationnelle.',
+        howSteps: [
+            { title: 'AS IS', desc: 'Nous cartographions les processus industriels clés, leurs flux, leurs anomalies et leurs modes de pilotage. Nous identifions les situations générant des pertes, les causes des dérives et les données permettant de les caractériser.' },
+            { title: 'TO BE', desc: 'Avec les équipes, nous définissons les critères de risque, les règles métier, les seuils d’alerte et les actions à engager. Selon le processus, les situations peuvent être caractérisées par des flux rouges, jaunes et verts : incidents avérés, risques et situations maîtrisées.' },
+            { title: 'DIGITALISATION', desc: 'Nous digitalisons les règles d’anticipation, les alertes, les indicateurs et les routines de décision. STRAP Software rend visibles les risques, les priorités et le suivi des actions, en s’appuyant autant que possible sur les systèmes existants.' },
+        ],
+        howClosing: 'STRAP® ne commence pas par un logiciel. Il commence par la compréhension du processus industriel et des décisions à anticiper.',
+        termsTitle: 'Quatre noms, une même démarche',
+        terms: [
+            { name: 'STRAP®', desc: 'La méthode : Strict Anticipation Process.' },
+            { name: 'STRAP Software', desc: 'Sa mise en œuvre digitale sur votre site : règles, alertes, indicateurs et routines.' },
+            { name: 'STRAP Tools', desc: 'Des outils en ligne pour démarrer : diagnostic de performance, Decision Radar, STRAPilot.' },
+            { name: 'STRAP Maintenance', desc: 'Une application de STRAP Software au processus maintenance — en développement.' },
+        ],
+
+        caseTag: 'STRAP® en action — Aperam Imphy',
+        caseTitle: 'Anticiper les non-conformités des matières premières avant leur utilisation en aciérie.',
+        caseChallengeTitle: 'Enjeu',
+        caseChallenge: 'La découverte tardive d’anomalies de réception, de conformité ou de certificats pouvait entraîner des pertes majeures.',
+        caseApproachTitle: 'Démarche',
+        caseApproach: ['Caractérisation des anomalies', 'Règles métier de conformité', 'Workflow digital de réception et de certificats', 'Indicateurs de conformité mis à jour', 'Routines opérationnelles quotidiennes'],
+        caseResultTitle: 'Résultat',
+        caseResult: 'Aucun rebut de matières premières neuves enregistré depuis mi-novembre 2023 sur le périmètre suivi, selon les résultats du projet.',
+        caseNote: 'Résultat obtenu sur le processus matières premières — pas un résultat STRAP Maintenance.',
     },
 };
 
@@ -332,7 +388,7 @@ export default function DiscoverStrAP() {
                     loop
                     playsInline
                     className="absolute inset-0 w-full h-full object-cover z-0 scale-111"
-                    src="/media/videos/StrAP_hero_bg.mp4"
+                    src="/media/videos/STRAP_hero_bg.mp4"
                 />
                 {/* Dark overlay so text stays readable */}
                 <div className="absolute inset-0 bg-slate-900/70 z-10" />
@@ -476,13 +532,70 @@ export default function DiscoverStrAP() {
             </section>
 
             {/* ══════════════════════════════════════════════════════════
+                HOW IT WORKS — AS IS → TO BE → DIGITALISATION
+            ══════════════════════════════════════════════════════════ */}
+            <section id="methode" className="py-24 px-6 bg-white scroll-mt-20">
+                <div className="max-w-6xl mx-auto">
+                    <FadeIn delay={100} className="text-center mb-14">
+                        <div className="inline-flex items-center gap-2 mb-4 text-xs font-bold uppercase tracking-[0.12em] text-[#FF6B00]">
+                            <span className="w-5 h-px bg-[#FF6B00]" /> {t.howTag} <span className="w-5 h-px bg-[#FF6B00]" />
+                        </div>
+                        <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight">{t.howTitle}</h2>
+                        <p className="text-slate-500 text-lg max-w-2xl mx-auto">{t.howSubtitle}</p>
+                    </FadeIn>
+
+                    {/* Horizontal on desktop, stacked on mobile */}
+                    <ol className="grid lg:grid-cols-3 gap-6 lg:gap-0 items-stretch">
+                        {t.howSteps.map((step, i) => {
+                            const Icon = [Search, Settings2, MonitorSmartphone][i];
+                            return (
+                                <li key={step.title} className="flex flex-col lg:flex-row items-stretch">
+                                    <FadeIn delay={150 + i * 120} className="flex-1 h-full">
+                                        <div className="h-full rounded-3xl border border-slate-200 bg-slate-50 p-8 hover:border-orange-200 hover:bg-[#FFF8F4] transition-all">
+                                            <div className="flex items-center gap-3 mb-5">
+                                                <span className="w-11 h-11 rounded-xl bg-[#FF6B00] text-white flex items-center justify-center"><Icon size={20} /></span>
+                                                <span className="text-xs font-bold text-slate-400">{String(i + 1).padStart(2, '0')}</span>
+                                            </div>
+                                            <h3 className="text-xl font-extrabold text-slate-900 tracking-wide mb-3">{step.title}</h3>
+                                            <p className="text-slate-600 leading-relaxed">{step.desc}</p>
+                                        </div>
+                                    </FadeIn>
+                                    {i < t.howSteps.length - 1 && (
+                                        <div className="flex items-center justify-center py-2 lg:py-0 lg:px-3 text-[#FF6B00]" aria-hidden="true">
+                                            <ArrowRight size={24} className="rotate-90 lg:rotate-0" />
+                                        </div>
+                                    )}
+                                </li>
+                            );
+                        })}
+                    </ol>
+
+                    <FadeIn delay={300}>
+                        <p className="mt-12 text-center text-xl sm:text-2xl font-bold text-slate-900 max-w-3xl mx-auto leading-snug">{t.howClosing}</p>
+                    </FadeIn>
+
+                    <FadeIn delay={350} className="mt-14">
+                        <h3 className="text-sm font-bold uppercase tracking-[0.12em] text-slate-400 text-center mb-5">{t.termsTitle}</h3>
+                        <dl className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {t.terms.map(term => (
+                                <div key={term.name} className="rounded-2xl border border-slate-200 p-5">
+                                    <dt className="font-extrabold text-slate-900 mb-1">{term.name}</dt>
+                                    <dd className="text-sm text-slate-600 leading-relaxed">{term.desc}</dd>
+                                </div>
+                            ))}
+                        </dl>
+                    </FadeIn>
+                </div>
+            </section>
+
+            {/* ══════════════════════════════════════════════════════════
                 DEMO VIDEO
             ══════════════════════════════════════════════════════════ */}
             <section className="py-24 px-6 bg-slate-50 border-y border-slate-100">
                 <div className="max-w-5xl mx-auto">
                     <FadeIn delay={100} className="text-center mb-16">
                         <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight">
-                            {t.demoTitle || 'See StrAP in Action'}
+                            {t.demoTitle || 'See STRAP in Action'}
                         </h2>
                         <p className="text-slate-500 text-lg max-w-2xl mx-auto">
                             {t.demoSubtitle || 'Discover the power of our platform in this short demonstration.'}
@@ -493,9 +606,48 @@ export default function DiscoverStrAP() {
                         <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200/50 bg-slate-900 aspect-video flex items-center justify-center">
                             {/* Inner glow/shadow for premium feel */}
                             <div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-3xl pointer-events-none z-10" />
-                            <AutoPlayVideo src="/media/videos/StrAP_Demo.mp4" poster="/Logo_Atperf_transpart.png" />
+                            <AutoPlayVideo src="/media/videos/STRAP_Demo.mp4" poster="/Logo_Atperf_transpart.png" />
                         </div>
                     </FadeIn>
+                </div>
+            </section>
+
+            {/* ══════════════════════════════════════════════════════════
+                STRAP® IN ACTION — Aperam Imphy (raw materials)
+            ══════════════════════════════════════════════════════════ */}
+            <section id="aperam" className="py-24 px-6 bg-slate-900 text-white scroll-mt-20">
+                <div className="max-w-6xl mx-auto">
+                    <FadeIn delay={100} className="mb-12 max-w-3xl">
+                        <div className="inline-flex items-center gap-2 mb-4 text-xs font-bold uppercase tracking-[0.12em] text-[#FF6B00]">
+                            <Factory size={14} /> {t.caseTag}
+                        </div>
+                        <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight">{t.caseTitle}</h2>
+                    </FadeIn>
+                    <div className="grid lg:grid-cols-3 gap-6">
+                        <FadeIn delay={150} className="h-full">
+                            <div className="h-full rounded-2xl bg-white/5 border border-white/10 p-7">
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-[#FF6B00] mb-3">{t.caseChallengeTitle}</h3>
+                                <p className="text-slate-300 leading-relaxed">{t.caseChallenge}</p>
+                            </div>
+                        </FadeIn>
+                        <FadeIn delay={250} className="h-full">
+                            <div className="h-full rounded-2xl bg-white/5 border border-white/10 p-7">
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-[#FF6B00] mb-3">{t.caseApproachTitle}</h3>
+                                <ul className="space-y-2">
+                                    {t.caseApproach.map(item => (
+                                        <li key={item} className="flex gap-2 text-slate-300"><CheckCircle2 size={17} className="text-[#FF6B00] shrink-0 mt-0.5" /> {item}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </FadeIn>
+                        <FadeIn delay={350} className="h-full">
+                            <div className="h-full rounded-2xl bg-[#FF6B00] p-7">
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-white/80 mb-3">{t.caseResultTitle}</h3>
+                                <p className="text-xl font-bold leading-snug">{t.caseResult}</p>
+                            </div>
+                        </FadeIn>
+                    </div>
+                    <p className="text-xs text-slate-400 mt-6">{t.caseNote}</p>
                 </div>
             </section>
 
@@ -520,7 +672,7 @@ export default function DiscoverStrAP() {
                                 <div className={`h-full rounded-3xl p-8 flex flex-col border transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${offer.highlight ? 'bg-slate-900 border-slate-700 text-white shadow-xl shadow-slate-900/20' : 'bg-white border-slate-100 hover:border-orange-200 hover:bg-[#FFF8F4]'}`}>
                                     {offer.highlight && (
                                         <div className="inline-flex self-start items-center gap-1.5 bg-[#FF6B00] text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-6">
-                                            <Zap size={11} /> Popular
+                                            <Zap size={11} /> {lang === 'fr' ? 'Le plus demandé' : 'Most requested'}
                                         </div>
                                     )}
                                     <span className={`text-xs font-bold uppercase tracking-widest mb-3 ${offer.highlight ? 'text-[#FF6B00]' : 'text-slate-400'}`}>

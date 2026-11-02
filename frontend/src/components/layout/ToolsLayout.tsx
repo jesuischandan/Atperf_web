@@ -8,15 +8,15 @@ import { useLang } from '../../utils/useLang';
 import API_URL from '../../utils/apiUrl';
 
 /* ─────────────────────────────────────────────────────────────
-   Shared shell for the logged-in StrAP tools: sidebar on desktop
+   Shared shell for the logged-in STRAP tools: sidebar on desktop
    (collapsible to icons), top bar + drawer on mobile.
 ───────────────────────────────────────────────────────────── */
 
 const COLLAPSE_KEY = 'strap_sidebar_collapsed';
 
 const T = {
-    en: { section: 'StrAP Tools', collapse: 'Collapse sidebar', expand: 'Expand sidebar', open: 'Open menu', close: 'Close menu', profile: 'My profile', staff: 'Staff', logOut: 'Log out', logIn: 'Log in', site: 'Back to the website' },
-    fr: { section: 'StrAP Tools', collapse: 'Réduire le menu', expand: 'Déplier le menu', open: 'Ouvrir le menu', close: 'Fermer le menu', profile: 'Mon profil', staff: 'Équipe', logOut: 'Déconnexion', logIn: 'Connexion', site: 'Retour au site' },
+    en: { section: 'STRAP Tools', collapse: 'Collapse sidebar', expand: 'Expand sidebar', open: 'Open menu', close: 'Close menu', profile: 'My profile', staff: 'Staff', logOut: 'Log out', logIn: 'Log in', site: 'Back to the website' },
+    fr: { section: 'STRAP Tools', collapse: 'Réduire le menu', expand: 'Déplier le menu', open: 'Ouvrir le menu', close: 'Fermer le menu', profile: 'Mon profil', staff: 'Équipe', logOut: 'Déconnexion', logIn: 'Connexion', site: 'Retour au site' },
 };
 
 function readJson<T>(key: string): T | null {

@@ -3,7 +3,9 @@ import ReactDOM from 'react-dom/client'
 import App from './App'
 import './index.css'
 import { installApiClient } from './utils/apiClient'
+import { applyLangFromUrl } from './utils/siteConfig'
 
+applyLangFromUrl()
 installApiClient()
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

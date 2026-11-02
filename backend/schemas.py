@@ -222,6 +222,7 @@ class ContactFormRequest(BaseModel):
     email: str
     phone: Optional[str] = None
     company: Optional[str] = None
+    topic: Optional[str] = None
     message: str
 
 # --- Use Cases Schemas ---

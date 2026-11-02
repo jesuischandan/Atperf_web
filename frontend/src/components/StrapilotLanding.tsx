@@ -13,11 +13,11 @@ const translations = {
         menu: "Menu",
         tagline: "The AI Copilot for Your Data",
         description: "Upload your structural data (CSV/Excel) and let AI combine it with your context to perform a deep predictive STRAP analysis, detecting weak signals and performance levers in seconds.",
-        ctaLoggedIn: "Launch StrAPilot",
-        ctaLoggedOut: "Try StrAPilot Now",
+        ctaLoggedIn: "Launch STRAPilot",
+        ctaLoggedOut: "Try STRAPilot Now",
         dashboardBtn: "Go to Dashboard",
         feature1Title: "Auto-Detected Headers",
-        feature1Desc: "No more mapping columns. StrAPilot's AI reads your data snippet and instantly understands your operational variables.",
+        feature1Desc: "No more mapping columns. STRAPilot's AI reads your data snippet and instantly understands your operational variables.",
         feature2Title: "AI Suggested KPIs",
         feature2Desc: "Stop guessing what to chart. Our AI analyzes your data structure and proposes the 2-3 most impactful visual metrics.",
         feature3Title: "Overall Executive Analysis",
@@ -33,11 +33,11 @@ const translations = {
         menu: "Menu",
         tagline: "Le Copilote IA de vos Données",
         description: "Uploadez vos données structurées (CSV/Excel) et laissez l'IA les croiser avec votre contexte pour générer une analyse STRAP prédictive, détectant les signaux faibles et leviers de performance en quelques secondes.",
-        ctaLoggedIn: "Lancer StrAPilot",
-        ctaLoggedOut: "Essayer StrAPilot Maintenant",
+        ctaLoggedIn: "Lancer STRAPilot",
+        ctaLoggedOut: "Essayer STRAPilot Maintenant",
         dashboardBtn: "Accéder au Tableau de Bord",
         feature1Title: "Détection Auto des Colonnes",
-        feature1Desc: "Fini le mappage manuel. L'IA de StrAPilot lit un extrait de vos données et comprend instantanément vos variables opérationnelles.",
+        feature1Desc: "Fini le mappage manuel. L'IA de STRAPilot lit un extrait de vos données et comprend instantanément vos variables opérationnelles.",
         feature2Title: "KPIs Suggérés par l'IA",
         feature2Desc: "Ne devinez plus quoi grapher. Notre IA analyse la structure de vos données et propose les 2 à 3 métriques visuelles les plus impactantes.",
         feature3Title: "Analyse Exécutive Globale",
@@ -74,7 +74,7 @@ const StrapilotLanding = () => {
                     <ArrowLeft size={18} /> <span className="hidden sm:inline">{t.back}</span>
                 </button>
                 <div className="flex items-center gap-2">
-                    <span className="text-xl font-bold tracking-tight text-slate-900">StrAP Tools</span>
+                    <span className="text-xl font-bold tracking-tight text-slate-900">STRAP Tools</span>
                 </div>
                 
                 {/* Desktop Menu */}
@@ -207,7 +207,7 @@ const StrapilotLanding = () => {
                     <Bot className="text-slate-700" size={40} />
                 </div>
                 <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6 text-slate-900">
-                    StrAPilot
+                    STRAPilot
                 </h1>
                 <p className="text-xl text-slate-600 font-semibold mb-8 uppercase tracking-widest">
                     {t.tagline}

@@ -138,10 +138,10 @@ export default function SubmitForm() {
                     
                     <div className="relative z-10">
                         <h2 className="text-3xl font-extrabold text-slate-900 mb-2">Résultat du Diagnostic</h2>
-                        <p className="text-slate-500 mb-8 font-medium">Votre performance opérationnelle évaluée par l'IA StrAP.</p>
+                        <p className="text-slate-500 mb-8 font-medium">Votre performance opérationnelle évaluée par l'IA STRAP.</p>
                         
                         <div className="bg-slate-50 border border-slate-200 rounded-2xl p-8 mb-8">
-                            <p className="text-sm text-slate-500 font-bold uppercase tracking-wider mb-2">Votre Score StrAP</p>
+                            <p className="text-sm text-slate-500 font-bold uppercase tracking-wider mb-2">Votre Score STRAP</p>
                             <div className="flex items-end justify-center gap-2 mb-4">
                                 <span className="text-6xl font-black text-indigo-600 leading-none">{result.score_100}</span>
                                 <span className="text-xl font-bold text-slate-400 mb-1">/ 100</span>
@@ -200,7 +200,7 @@ export default function SubmitForm() {
                                                 filename: pdfResult.filename,
                                                 reportType: 'proextract',
                                                 language: 'fr',
-                                                reportTitle: 'Diagnostic StrAP',
+                                                reportTitle: 'Diagnostic STRAP',
                                                 overallOutcomes: result.category_result
                                             });
                                             setIsEmailModalOpen(true);
@@ -337,7 +337,7 @@ export default function SubmitForm() {
                         ) : (
                             <button onClick={handleSubmit} disabled={!canAdvance() || loading}
                                 className="flex-1 bg-indigo-600 text-white py-3.5 rounded-xl font-bold hover:bg-indigo-500 transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-indigo-600/20">
-                                {loading ? <><Loader2 size={18} className="animate-spin" /> Analyse StrAP...</> : <><Brain size={18} /> Lancer le Diagnostic</>}
+                                {loading ? <><Loader2 size={18} className="animate-spin" /> Analyse STRAP...</> : <><Brain size={18} /> Lancer le Diagnostic</>}
                             </button>
                         )}
                     </div>

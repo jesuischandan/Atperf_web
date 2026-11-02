@@ -70,26 +70,26 @@ def notify_admins_new_request(admin_emails: list[str], applicant_name: str, appl
             if request_type == "External User":
                 msg.set_content(
                     f"Hello,\n\n"
-                    f"A new external user has just joined the platform and verified their email on StrAP Tools.\n\n"
+                    f"A new external user has just joined the platform and verified their email on STRAP Tools.\n\n"
                     f"User Details:\n"
                     f"  Name:  {applicant_name}\n"
                     f"  Email: {applicant_email}\n\n"
                     f"This is an informational message. No approval is required.\n\n"
-                    f"Best regards,\nThe StrAP Tools Team"
+                    f"Best regards,\nThe STRAP Tools Team"
                 )
-                msg['Subject'] = f"[StrAP Tools] New External User Joined – {applicant_name}"
+                msg['Subject'] = f"[STRAP Tools] New External User Joined – {applicant_name}"
             else:
                 msg.set_content(
                     f"Hello,\n\n"
-                    f"A new {request_type} account request is awaiting your approval on StrAP Tools.\n\n"
+                    f"A new {request_type} account request is awaiting your approval on STRAP Tools.\n\n"
                     f"Applicant Details:\n"
                     f"  Name:  {applicant_name}\n"
                     f"  Email: {applicant_email}\n"
                     f"  Type:  {request_type}\n\n"
                     f"Please log in to the Admin Panel to review and approve or reject this request.\n\n"
-                    f"Best regards,\nThe StrAP Tools Team"
+                    f"Best regards,\nThe STRAP Tools Team"
                 )
-                msg['Subject'] = f"[StrAP Tools] New {request_type} Account Request – {applicant_name}"
+                msg['Subject'] = f"[STRAP Tools] New {request_type} Account Request – {applicant_name}"
                 
             msg['From'] = GMAIL_USER
             msg['To'] = admin_email
@@ -136,10 +136,9 @@ def send_pdf_report_email(to_emails: list[str], cc_emails: list[str], subject: s
         logger.error(f"Failed to send PDF report email: {e}")
         return False
 
-def send_contact_email(name: str, email: str, phone: str, company: str, subject: str, message: str) -> bool:
+def send_contact_email(name: str, email: str, phone: str, company: str, subject: str, message: str, topic: str = "") -> bool:
     """
-    Sends the contact form submission to c.kumar@atperf.com and r.rahbi@atperf.com
-    (using 'r.rabhi@atperf.com' as requested).
+    Sends the contact form submission to c.kumar@atperf.com and r.rabhi@atperf.com.
     """
     if not GMAIL_USER or not GMAIL_PASSWORD:
         logger.error("Email configuration is missing in environment variables.")
@@ -155,7 +154,8 @@ def send_contact_email(name: str, email: str, phone: str, company: str, subject:
             f"Name:    {name}\n"
             f"Email:   {email}\n"
             f"Phone:   {phone if phone else 'N/A'}\n"
-            f"Company: {company if company else 'N/A'}\n\n"
+            f"Company: {company if company else 'N/A'}\n"
+            f"Topic:   {topic if topic else 'N/A'}\n\n"
             f"Message:\n{message}\n"
         )
         msg.set_content(content)

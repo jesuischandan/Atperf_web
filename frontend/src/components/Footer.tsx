@@ -75,7 +75,7 @@ export default function Footer({ lang }: { lang: 'en' | 'fr' }) {
                             <h4 className="font-bold text-slate-900 uppercase tracking-wider text-sm">{t.contactDetails}</h4>
                             <div className="flex flex-col gap-2 font-medium text-slate-500">
                                 <a href="tel:+33661409529" className="hover:text-[#FF6B00] transition-colors">+33 6 61 40 95 29</a>
-                                <a href="mailto:r.rahbi@atperf.com" className="hover:text-[#FF6B00] transition-colors">r.rahbi@atperf.com</a>
+                                <a href="mailto:r.rabhi@atperf.com" className="hover:text-[#FF6B00] transition-colors">r.rabhi@atperf.com</a>
                             </div>
                         </div>
 

@@ -1,64 +1,82 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, ArrowDown, Gauge, Layers, ShieldCheck } from 'lucide-react';
+import { ArrowRight, ArrowDown, Clock, Gauge, Layers, ShieldCheck } from 'lucide-react';
+import { MAINTENANCE_DEMO_PUBLIC } from '../../utils/siteConfig';
 
 /* ─────────────────────────────────────────────────────────────
-   STRAP Maintenance — explanatory section (Discover + STRAP Software page)
-   Layout follows STRAP_Maintenance_Apercu_Discover.pdf
+   STRAP Maintenance — explanatory section (Discover)
+   Layout follows STRAP_Maintenance_Apercu_Discover.pdf; copy from the
+   prospecting brief (Nov. 2026).
 ───────────────────────────────────────────────────────────── */
 
 const T = {
     fr: {
         eyebrow: 'STRAP Maintenance',
-        kicker: 'Votre prochaine application industrielle',
-        title: 'De l’anticipation des rebuts à l’anticipation des pannes',
-        subtitle: 'Même méthodologie STRAP, nouveaux critères métier et nouvelle matrice d’anticipation.',
-        status: 'Prototype en développement — pilote industriel recherché',
-        flows: [
-            { key: 'red', label: 'Flux rouge', desc: 'Avis / OT — Pannes et urgences' },
-            { key: 'green', label: 'Flux vert', desc: 'Avis / OT — Préventifs et planifiés' },
-            { key: 'yellow', label: 'Flux jaune', desc: 'Avis / OT — Différés ou d’opportunité' },
+        title: 'De l’anticipation des rebuts à l’anticipation des pannes.',
+        intro: 'Dans les organisations industrielles, des Avis et Ordres de Travail sont différés ou restent en attente. Certains peuvent constituer des signaux précoces de défaillances futures.',
+        aimsTitle: 'STRAP Maintenance vise à :',
+        aims: [
+            'analyser les historiques d’Avis, d’OT et de pannes ;',
+            'rechercher des liens possibles entre événements différés et défaillances ;',
+            'définir des critères de risque : criticité, symptômes, récurrence, délais ;',
+            'prioriser les situations et organiser les arbitrages quotidiens Production / Maintenance.',
         ],
+        status: 'En développement — démonstrateur interactif prochainement disponible',
+        flows: [
+            { key: 'red', label: 'Flux rouge', desc: 'Panne ou défaillance corrective.' },
+            { key: 'yellow', label: 'Flux jaune', desc: 'Avis / OT différé ou opportunité de maintenance nécessitant une évaluation du risque et une décision.' },
+            { key: 'green', label: 'Flux vert', desc: 'Intervention planifiée ou situation maîtrisée.' },
+        ],
+        flowsNote: 'Ces catégories sont adaptées aux processus de chaque site.',
         matrixTitle: 'Matrice dynamique STRAP d’anticipation',
-        matrixTags: ['Historiques', 'Causes sources', 'Symptômes', 'Criticité', 'Récurrence', 'Scoring'],
+        matrixTags: ['Historiques', 'Causes sources', 'Symptômes', 'Criticité', 'Récurrence', 'Délais'],
         priorityTitle: 'Prioriser les jaunes à risque de rouge',
-        priorityDesc: 'Identifier et prioriser les Avis JAUNES présentant un risque d’évolution vers une panne ROUGE.',
+        priorityDesc: 'Identifier les Avis JAUNES susceptibles d’évoluer vers une panne ROUGE et décider des actions à engager.',
         cockpitTitle: 'Cockpit Production / Maintenance',
         cockpitTags: ['Arbitrage quotidien', 'Actions anticipatives', 'Validation humaine'],
-        complement: 'STRAP Maintenance est un dispositif complémentaire aux processus et outils existants de gestion opérationnelle de la maintenance (SAP PM, GMAO, ARMP…).',
-        proposal: 'Notre proposition : accompagner chaque industriel dans l’adaptation, la validation et le déploiement de son propre dispositif d’anticipation, en fonction de ses équipements, de ses règles métier et de ses données historiques, afin de renforcer sa capacité à prévenir les aléas et arrêts de maintenance.',
-        cta: 'Simulateur STRAP Software Maintenance',
+        positioning: 'STRAP Software Maintenance vise à fournir une couche digitale d’anticipation et d’aide à la décision complémentaire à SAP PM, aux GMAO et à ARMP.',
+        caveat: 'Application actuellement en développement et démonstration ; son efficacité devra être évaluée sur les données et processus de chaque site.',
+        cta: 'Échanger sur une application STRAP Maintenance',
+        demo: 'Essayer le démonstrateur',
+        soon: 'Démonstrateur interactif prochainement disponible',
         more: 'En savoir plus',
-        disclaimer: 'Aperçu conceptuel — performances prédictives à démontrer par pilote.',
     },
     en: {
         eyebrow: 'STRAP Maintenance',
-        kicker: 'Your next industrial application',
-        title: 'From anticipating scrap to anticipating breakdowns',
-        subtitle: 'Same STRAP methodology, new business criteria and a new anticipation matrix.',
-        status: 'Prototype in development — industrial pilot partner wanted',
-        flows: [
-            { key: 'red', label: 'Red flow', desc: 'Notifications / WO — Breakdowns and emergencies' },
-            { key: 'green', label: 'Green flow', desc: 'Notifications / WO — Preventive and planned' },
-            { key: 'yellow', label: 'Yellow flow', desc: 'Notifications / WO — Deferred or opportunity' },
+        title: 'From anticipating scrap to anticipating breakdowns.',
+        intro: 'In industrial organisations, maintenance notifications and work orders get deferred or remain pending. Some of them may be early signals of future failures.',
+        aimsTitle: 'STRAP Maintenance aims to:',
+        aims: [
+            'analyse notification, work-order and breakdown history;',
+            'look for possible links between deferred events and failures;',
+            'define risk criteria: criticality, symptoms, recurrence, delays;',
+            'prioritise situations and organise daily Production / Maintenance arbitration.',
         ],
+        status: 'In development — interactive demonstrator coming soon',
+        flows: [
+            { key: 'red', label: 'Red flow', desc: 'Breakdown or corrective failure.' },
+            { key: 'yellow', label: 'Yellow flow', desc: 'Deferred notification / work order or maintenance opportunity that needs a risk assessment and a decision.' },
+            { key: 'green', label: 'Green flow', desc: 'Planned intervention or situation under control.' },
+        ],
+        flowsNote: 'These categories are adapted to each site’s processes.',
         matrixTitle: 'STRAP dynamic anticipation matrix',
-        matrixTags: ['History', 'Root causes', 'Symptoms', 'Criticality', 'Recurrence', 'Scoring'],
+        matrixTags: ['History', 'Root causes', 'Symptoms', 'Criticality', 'Recurrence', 'Delays'],
         priorityTitle: 'Prioritise yellows at risk of turning red',
-        priorityDesc: 'Identify and prioritise YELLOW notifications at risk of evolving into a RED breakdown.',
+        priorityDesc: 'Identify YELLOW notifications likely to evolve into a RED breakdown and decide which actions to take.',
         cockpitTitle: 'Production / Maintenance cockpit',
         cockpitTags: ['Daily arbitration', 'Anticipatory actions', 'Human validation'],
-        complement: 'STRAP Maintenance complements your existing maintenance processes and tools (SAP PM, CMMS, ARMP…). It does not replace them.',
-        proposal: 'Our proposal: support each manufacturer in adapting, validating and deploying its own anticipation system — based on its equipment, business rules and historical data — to strengthen its ability to prevent maintenance hazards and stoppages.',
-        cta: 'STRAP Software Maintenance simulator',
+        positioning: 'STRAP Software Maintenance aims to provide a digital layer for anticipation and decision support that complements SAP PM, CMMS tools and ARMP.',
+        caveat: 'Application currently in development and demonstration; its effectiveness will have to be assessed on each site’s data and processes.',
+        cta: 'Discuss a STRAP Maintenance application',
+        demo: 'Try the demonstrator',
+        soon: 'Interactive demonstrator coming soon',
         more: 'Learn more',
-        disclaimer: 'Conceptual preview — predictive performance to be demonstrated through a pilot.',
     },
 };
 
 const FLOW_STYLE: Record<string, { card: string; label: string; dot: string }> = {
     red: { card: 'bg-red-50 border-red-100', label: 'text-red-700', dot: 'bg-red-500' },
-    green: { card: 'bg-emerald-50 border-emerald-100', label: 'text-emerald-700', dot: 'bg-emerald-500' },
     yellow: { card: 'bg-amber-50 border-amber-200', label: 'text-amber-700', dot: 'bg-amber-400' },
+    green: { card: 'bg-emerald-50 border-emerald-100', label: 'text-emerald-700', dot: 'bg-emerald-500' },
 };
 
 function Connector() {
@@ -74,16 +92,19 @@ export default function StrapMaintenanceSection({ lang, showMoreLink = true }: {
     const t = T[lang];
 
     return (
-        <section id="strap-maintenance" className="py-24 px-6 bg-slate-50 border-y border-slate-100">
+        <section id="strap-maintenance" className="py-24 px-6 bg-slate-50 border-y border-slate-100 scroll-mt-20">
             <div className="max-w-5xl mx-auto">
                 {/* Header */}
-                <div className="mb-12">
+                <div className="mb-10">
                     <div className="inline-flex items-center gap-2 mb-4 text-xs font-bold uppercase tracking-[0.12em] text-[#FF6B00]">
                         <span className="w-6 h-px bg-[#FF6B00]" /> {t.eyebrow}
                     </div>
-                    <p className="text-slate-500 text-lg mb-2">{t.kicker}</p>
-                    <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight leading-tight">{t.title}</h2>
-                    <p className="text-slate-600 text-lg max-w-3xl mb-6">{t.subtitle}</p>
+                    <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 mb-5 tracking-tight leading-tight">{t.title}</h2>
+                    <p className="text-slate-700 text-lg max-w-3xl mb-5">{t.intro}</p>
+                    <p className="font-semibold text-slate-800 mb-2">{t.aimsTitle}</p>
+                    <ul className="list-disc pl-5 space-y-1 text-slate-600 max-w-3xl mb-6">
+                        {t.aims.map(a => <li key={a}>{a}</li>)}
+                    </ul>
                     <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider bg-white border border-slate-200 text-slate-600 px-3 py-1.5 rounded-full">
                         <span className="w-2 h-2 rounded-full bg-[#FF6B00] animate-pulse" /> {t.status}
                     </span>
@@ -100,6 +121,7 @@ export default function StrapMaintenanceSection({ lang, showMoreLink = true }: {
                         </div>
                     ))}
                 </div>
+                <p className="text-center text-xs text-slate-500 mt-3">{t.flowsNote}</p>
 
                 <Connector />
 
@@ -143,20 +165,27 @@ export default function StrapMaintenanceSection({ lang, showMoreLink = true }: {
                 </div>
 
                 {/* Positioning */}
-                <div className="max-w-3xl mx-auto text-center mt-12 space-y-4">
-                    <p className="text-slate-800 font-semibold">{t.complement}</p>
-                    <p className="text-slate-600 leading-relaxed">{t.proposal}</p>
+                <div className="max-w-3xl mx-auto text-center mt-12 space-y-3">
+                    <p className="text-slate-800 font-semibold">{t.positioning}</p>
+                    <p className="text-slate-500 text-sm">{t.caveat}</p>
                 </div>
 
-                {/* CTA */}
-                <div className="flex flex-col sm:flex-row justify-center gap-4 mt-10">
+                {/* CTA — no live demo until the demonstrator is tested */}
+                <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-10">
                     <button
-                        onClick={() => navigate('/strap-software/maintenance/demo')}
+                        onClick={() => navigate('/contact?topic=maintenance')}
                         className="w-full sm:w-auto inline-flex justify-center items-center gap-2 bg-[#FF6B00] hover:bg-[#E66000] text-white font-bold px-8 py-4 rounded-xl shadow-lg shadow-[#FF6B00]/25 transition-all hover:-translate-y-0.5"
                     >
                         {t.cta} <ArrowRight size={17} />
                     </button>
-                    {showMoreLink && (
+                    {MAINTENANCE_DEMO_PUBLIC ? (
+                        <button
+                            onClick={() => navigate('/strap-software/maintenance/demo')}
+                            className="w-full sm:w-auto inline-flex justify-center items-center gap-2 text-slate-700 font-semibold px-8 py-4 rounded-xl border border-slate-300 hover:bg-white transition-all"
+                        >
+                            {t.demo}
+                        </button>
+                    ) : showMoreLink && (
                         <button
                             onClick={() => navigate('/strap-software/maintenance')}
                             className="w-full sm:w-auto inline-flex justify-center items-center gap-2 text-slate-700 font-semibold px-8 py-4 rounded-xl border border-slate-300 hover:bg-white transition-all"
@@ -165,7 +194,11 @@ export default function StrapMaintenanceSection({ lang, showMoreLink = true }: {
                         </button>
                     )}
                 </div>
-                <p className="text-center text-xs text-slate-500 mt-6">{t.disclaimer}</p>
+                {!MAINTENANCE_DEMO_PUBLIC && (
+                    <p className="flex justify-center items-center gap-2 text-sm text-slate-500 mt-5">
+                        <Clock size={15} className="text-[#FF6B00]" /> {t.soon}
+                    </p>
+                )}
             </div>
         </section>
     );

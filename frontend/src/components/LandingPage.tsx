@@ -1,7 +1,8 @@
 import LandingPageNav from "./LandingPageNav";
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Bot, Brain, ArrowRight, Navigation, TrendingUp, Users, Award, ChevronRight } from 'lucide-react';
+import { Bot, Brain, ArrowRight, Navigation, TrendingUp, Users, Award, ChevronRight, Factory, Wrench, Clock } from 'lucide-react';
+import { MAINTENANCE_DEMO_PUBLIC } from '../utils/siteConfig';
 import Footer from './Footer';
 
 /* ─────────────────────────────────────────────────────────────
@@ -12,8 +13,8 @@ const T = {
         tagline: 'Atperf Conseil',
         heroBold: 'Activate the Performance',
         heroLight: 'you’re already losing',
-        heroDesc: 'Most manufacturers lose between 15% and 30% of their performance without even realizing it. ATPERF identifies, unlocks, and secures these gains in less than 90 days.',
-        accessBtn: 'Try the StrAP® diagnosis',
+        heroDesc: 'Many manufacturers lose performance without seeing it: deviations, incidents and losses that could have been anticipated. ATPERF helps your teams identify these losses, act on them and secure the gains over time.',
+        accessBtn: 'Try the STRAP® diagnosis',
         discoverBtn: 'Discover the method',
         stat1: '$10M+',
         stat1Label: 'avg. yearly savings per programme',
@@ -34,11 +35,11 @@ const T = {
             'operate in misaligned silos'
         ],
         businessStressConclusion: 'What you don’t have under control today is exactly what’s undermining your performance.',
-        serviceTitle: 'The StrAP Tool Suite',
-        serviceSubtitle: 'Precision instruments built on the StrAP\u00ae methodology—turning operational friction into competitive edge.',
+        serviceTitle: 'The STRAP Tool Suite',
+        serviceSubtitle: 'Precision instruments built on the STRAP\u00ae methodology—turning operational friction into competitive edge.',
         targetUser: 'Built for',
         learnMore: 'Get Started',
-        StrapDiagTitle: 'StrAP Perf Diagnostic™',
+        StrapDiagTitle: 'STRAP Perf Diagnostic™',
         StrapDiagTag: 'Performance Decoder',
         StrapDiagDesc: 'A fast, AI-powered diagnostic that evaluates your organization across 5 critical performance dimensions—pilotage, anticipation, loss management, operational discipline, and reactivity.',
         StrapDiagUser: 'Plant Managers · Ops Leads',
@@ -46,24 +47,20 @@ const T = {
         radarTag: 'Priority Filter',
         radarDesc: 'Input conflicting projects and the Radar ranks them based on ROI, effort, and strategic alignment—no more endless debates.',
         radarUser: 'Executives · COOs',
-        anchorTitle: 'StrAPilot Dashboard',
+        anchorTitle: 'STRAPilot Dashboard',
         anchorTag: 'AI Data Strategy',
         anchorDesc: 'Upload raw datasets and let our AI engine generate strategic KPIs, analyze trends, and identify hidden focal points automatically.',
         anchorUser: 'Data Leads · Analysts',
-        methodTitleTag: 'The StrAP® Method',
+        methodTitleTag: 'The STRAP® Method',
         methodTitle: 'Underperformance is not an operational problem',
         methodAccent: 'It is a problem of anticipation',
-        methodDesc: 'Every deviation, incident, or loss could be anticipated before it impacted your operations.',
-        methodDesignTitle: 'A structured methodology designed to:',
-        methodDesignList: [
-            'Anticipate deviations',
-            'Manage operations in real time',
-            'Secure lasting performance'
-        ],
+        methodDesc: 'STRAP® (Strict Anticipation Process) is an operational excellence approach that anticipates disruptions in key industrial processes before they turn into losses. It combines analysis of the real processes, characterisation of risk situations, business rules and digital tools to help teams detect deviations, prioritise actions and secure performance over time.',
+        methodDifferenceTitle: 'Our difference',
+        methodDifference: 'We start from the industrial process and its business rules, then use digital tools and AI where they bring measurable operational value.',
+        methodCta: 'See how STRAP® works',
         strTitlePart1: 'Str — ',
         strWord1: 'Strict',
-        strWord2: 'Strategic',
-        strDesc: 'A disciplined approach that ensures any deviation is detected and addressed before it impacts operations.',
+        strDesc: 'A disciplined approach so that deviations are detected and addressed before they impact operations.',
         aTitle: 'A — Anticipation',
         aDesc: 'Identify early warning signs to prevent disruptions and losses before they affect your business.',
         pTitle: 'P — Process',
@@ -71,28 +68,41 @@ const T = {
         quoteBody: '"Consulting reports often sit in drawers—because they lack the tools to sustain change."',
         quoteAuthor: '— ATPERF Conseil',
         ctaTitle: 'Ready to turn insight into action?',
-        ctaDesc: 'Join industry leaders already using StrAP Tools to close the gap between the boardroom and the shop floor.',
+        ctaDesc: 'Join industry leaders already using STRAP Tools to close the gap between the boardroom and the shop floor.',
         ctaBtn: 'Start for Free',
         ctaSecondary: 'Book a demo',
         navHome: 'Home',
         navService: 'Service',
         navUseCases: 'Use Cases',
         navContact: 'Contact',
-        navDashboard: 'StrAP Tools',
+        navDashboard: 'STRAP Tools',
         hi: 'Hi',
         logOut: 'Log out',
         logIn: 'Log in',
         signUp: 'Sign up',
         admin: 'Admin',
         staffPortal: 'Staff Portal',
+        proofTag: 'STRAP® in industrial application',
+        proofTitle: 'Aperam Imphy — anticipating new raw-material anomalies',
+        proofBody: 'At Aperam Imphy, ATPERF deployed an anomaly-anticipation approach on the steel plant’s new raw-material management process. Business rules, a digital workflow, conformity indicators and daily routines helped eliminate new raw-material scrap on the monitored scope since mid-November 2023.',
+        proofResult: 'No new raw-material scrap recorded on the monitored scope since mid-November 2023',
+        proofLink: 'Read the case study',
+        maintTag: 'STRAP Maintenance',
+        maintTitle: 'Anticipate breakdowns before they become emergencies.',
+        maintQuestion: 'What if some deferred maintenance notifications were the first signals of future breakdowns?',
+        maintBody: 'STRAP Maintenance aims to use notification and work-order history, symptoms, recurrence, criticality and business rules to identify and prioritise situations likely to lead to unplanned stoppages.',
+        maintComplement: 'Complements CMMS, SAP PM and ARMP',
+        maintSoon: 'Interactive demonstrator coming soon',
+        maintLink: 'Discover STRAP Maintenance',
+        maintDemo: 'Try the demonstrator',
         copyright: `\u00a9 ${new Date().getFullYear()} Atperf Conseil\u00a0·\u00a0All rights reserved`,
     },
     fr: {
         tagline: 'Atperf Conseil',
         heroBold: 'Activez la Performance',
         heroLight: 'que vous perdez déjà',
-        heroDesc: 'La plupart des industriels perdent entre 15% et 30% de performance sans le voir. ATPERF identifie, active et sécurise ces gains en moins de 90 jours.',
-        accessBtn: 'Faire le diagnostic StrAP®',
+        heroDesc: 'De nombreux industriels perdent de la performance sans le voir : dérives, incidents et pertes qui auraient pu être anticipés. ATPERF aide vos équipes à identifier ces pertes, à agir et à sécuriser durablement les gains.',
+        accessBtn: 'Faire le diagnostic STRAP®',
         discoverBtn: 'Découvrir la méthode',
         stat1: '10M\u00a0€+',
         stat1Label: '\u00e9conomies annuelles moyennes',
@@ -113,12 +123,12 @@ const T = {
             'fonctionnent en silos désalignés'
         ],
         businessStressConclusion: 'Ce que vous ne maîtrisez pas aujourd’hui est exactement ce qui dégrade votre performance.',
-        serviceTitle: 'La Suite StrAP Tools',
-        serviceSubtitle: 'Des instruments pr\u00e9cis con\u00e7us sur la m\u00e9thodologie StrAP\u00ae—transformant les frictions op\u00e9rationnelles en avantage concurrentiel.',
+        serviceTitle: 'La Suite STRAP Tools',
+        serviceSubtitle: 'Des instruments pr\u00e9cis con\u00e7us sur la m\u00e9thodologie STRAP\u00ae—transformant les frictions op\u00e9rationnelles en avantage concurrentiel.',
         mostPopular: 'Le plus populaire',
         targetUser: 'Con\u00e7u pour',
         learnMore: 'Commencer',
-        StrapDiagTitle: 'StrAP Perf Diagnostic\u2122',
+        StrapDiagTitle: 'STRAP Perf Diagnostic\u2122',
         StrapDiagTag: 'D\u00e9codeur de performance',
         StrapDiagDesc: 'Un diagnostic rapide, aliment\u00e9 par l\'IA, qui \u00e9value votre organisation selon 5 dimensions critiques de performance\u2014pilotage, anticipation, gestion des pertes, discipline op\u00e9rationnelle et r\u00e9activit\u00e9.',
         StrapDiagUser: 'Responsables de site · Ops',
@@ -126,24 +136,20 @@ const T = {
         radarTag: 'Filtre de priorit\u00e9',
         radarDesc: 'Entrez vos projets conflictuels et le Radar les classe selon le ROI, l\u2019effort et l\u2019alignement strat\u00e9gique\u2014fini les d\u00e9bats sans fin.',
         radarUser: 'Dirigeants · COO',
-        anchorTitle: 'StrAPilot Dashboard',
+        anchorTitle: 'STRAPilot Dashboard',
         anchorTag: 'Stratégie de Données IA',
         anchorDesc: 'Téléchargez vos jeux de données bruts et laissez notre IA générer des KPIs stratégiques, analyser les tendances et identifier les angles morts automatiquement.',
         anchorUser: 'Data Leads · Analystes',
-        methodTitleTag: 'La méthode StrAP®',
+        methodTitleTag: 'La méthode STRAP®',
         methodTitle: 'La non-performance n’est pas un problème opérationnel.',
         methodAccent: 'C’est un problème d’anticipation.',
-        methodDesc: 'Chaque déviation, incident ou perte pouvait être anticipé avant d’impacter vos opérations.',
-        methodDesignTitle: 'Une méthodologie structurée conçue pour :',
-        methodDesignList: [
-            'Anticiper les déviations',
-            'Gérer les opérations en temps réel',
-            'Sécuriser la performance durable'
-        ],
+        methodDesc: 'STRAP® (Strict Anticipation Process) est une démarche d’excellence opérationnelle qui permet d’anticiper les aléas des processus industriels clés avant qu’ils ne génèrent des pertes. Elle combine l’analyse des processus réels, la caractérisation des situations à risque, les règles métier et les outils digitaux pour aider les équipes à détecter les dérives, prioriser les actions et sécuriser durablement la performance.',
+        methodDifferenceTitle: 'Notre différence',
+        methodDifference: 'Partir du processus industriel et de ses règles métier, puis utiliser le digital et l’IA lorsque cela apporte une valeur opérationnelle mesurable.',
+        methodCta: 'Découvrir comment fonctionne STRAP®',
         strTitlePart1: 'Str — ',
         strWord1: 'Strict',
-        strWord2: 'Strat\u00e9gique',
-        strDesc: 'Une approche disciplinée qui garantit que toute déviation est détectée et traitée avant d’impacter les opérations.',
+        strDesc: 'Une approche disciplinée pour que les déviations soient détectées et traitées avant d’impacter les opérations.',
         aTitle: 'A — Anticipation',
         aDesc: 'Identifier tôt les signaux faibles pour prévenir les perturbations et les pertes avant qu’elles n’affectent votre activité.',
         pTitle: 'P — Processus',
@@ -151,20 +157,33 @@ const T = {
         quoteBody: '\u00ab\u00a0Les rapports de conseil restent souvent dans les tiroirs\u2014faute d\u2019outils pour ancrer le changement.\u00a0\u00bb',
         quoteAuthor: '— ATPERF Conseil',
         ctaTitle: 'Pr\u00eat \u00e0 transformer l\u2019analyse en action\u00a0?',
-        ctaDesc: 'Rejoignez les leaders industriels qui utilisent d\u00e9j\u00e0 StrAP Tools pour combler le foss\u00e9 entre le COMEX et l\u2019atelier.',
+        ctaDesc: 'Rejoignez les leaders industriels qui utilisent d\u00e9j\u00e0 STRAP Tools pour combler le foss\u00e9 entre le COMEX et l\u2019atelier.',
         ctaBtn: 'Commencer gratuitement',
         ctaSecondary: 'Demander une d\u00e9mo',
         navHome: 'Accueil',
         navService: 'Services',
         navUseCases: 'Cas d\u2019usage',
         navContact: 'Contact',
-        navDashboard: 'StrAP Tools',
+        navDashboard: 'STRAP Tools',
         hi: 'Bonjour',
         logOut: 'D\u00e9connexion',
         logIn: 'Connexion',
         signUp: 'S\u2019inscrire',
         admin: 'Admin',
         staffPortal: 'Portail Interne',
+        proofTag: 'STRAP® en application industrielle',
+        proofTitle: 'Aperam Imphy — anticiper les anomalies des matières premières neuves',
+        proofBody: 'Chez Aperam Imphy, ATPERF a déployé une démarche d’anticipation des anomalies sur le processus de gestion des matières premières neuves de l’aciérie. Règles métier, workflow digital, indicateurs de conformité et routines quotidiennes ont contribué à éliminer les rebuts de matières premières neuves sur le périmètre suivi depuis mi-novembre 2023.',
+        proofResult: 'Aucun rebut de matières premières neuves enregistré sur le périmètre suivi depuis mi-novembre 2023',
+        proofLink: 'Voir le cas d’étude',
+        maintTag: 'STRAP Maintenance',
+        maintTitle: 'Anticiper les pannes avant qu’elles ne deviennent des urgences.',
+        maintQuestion: 'Et si certains Avis de maintenance différés étaient les premiers signaux de futures pannes ?',
+        maintBody: 'STRAP Maintenance vise à exploiter les historiques d’Avis/OT, les symptômes, les récurrences, la criticité et les règles métier pour identifier et prioriser les situations susceptibles de conduire à des arrêts non planifiés.',
+        maintComplement: 'Approche complémentaire aux GMAO, SAP PM et ARMP',
+        maintSoon: 'Démonstrateur interactif prochainement disponible',
+        maintLink: 'Découvrir STRAP Maintenance',
+        maintDemo: 'Essayer le démonstrateur',
         copyright: `\u00a9 ${new Date().getFullYear()} Atperf Conseil\u00a0·\u00a0Tous droits r\u00e9serv\u00e9s`,
     },
 };
@@ -258,59 +277,11 @@ function FadeIn({ children, delay = 0, className = "", direction = "up" }: { chi
 }
 
 /* ─────────────────────────────────────────────────────────────
-   Typewriter Animation Component
-───────────────────────────────────────────────────────────── */
-function TypewriterWord({ word1, word2 }: { word1: string, word2: string }) {
-    const [text, setText] = useState(word1);
-    const [isDeleting, setIsDeleting] = useState(false);
-    const [wordIndex, setWordIndex] = useState(0);
-
-    // Reset when words change (e.g., lang switch)
-    useEffect(() => {
-        setText(word1);
-        setIsDeleting(false);
-        setWordIndex(0);
-    }, [word1, word2]);
-
-    useEffect(() => {
-        let timer: ReturnType<typeof setTimeout>;
-        const words = [word1, word2];
-        const currentWord = words[wordIndex];
-
-        if (isDeleting) {
-            timer = setTimeout(() => {
-                setText((prev) => prev.slice(0, prev.length - 1));
-                if (text.length <= 1) {
-                    setIsDeleting(false);
-                    setWordIndex((prev) => (prev === 0 ? 1 : 0));
-                }
-            }, 60);
-        } else {
-            if (text.length < currentWord.length) {
-                timer = setTimeout(() => {
-                    setText(currentWord.slice(0, text.length + 1));
-                }, 80);
-            } else {
-                timer = setTimeout(() => {
-                    setIsDeleting(true);
-                }, 3000);
-            }
-        }
-
-        return () => clearTimeout(timer);
-    }, [text, isDeleting, wordIndex, word1, word2]);
-
-    return (
-        <span className="inline-flex items-center">
-            {text}
-            <span className="w-[2px] h-[1em] bg-slate-900 ml-[2px] animate-pulse"></span>
-        </span>
-    );
-}
-
-/* ─────────────────────────────────────────────────────────────
    Main component
 ───────────────────────────────────────────────────────────── */
+// Homepage figures ($10M+, 98 %, 18 weeks) stay hidden until verified by ATPERF.
+const SHOW_STATS = false;
+
 const LandingPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -444,9 +415,9 @@ const LandingPage = () => {
             </section>
 
             {/* ══════════════════════════════════════════════════════════
-                STATS BAR
+                STATS BAR — hidden until each figure is verified (see SHOW_STATS)
             ══════════════════════════════════════════════════════════ */}
-            <div className="bg-slate-900 text-white py-12 px-6">
+            {SHOW_STATS && <div className="bg-slate-900 text-white py-12 px-6">
                 <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-4 text-center">
                     {[
                         { value: t.stat1, label: t.stat1Label, icon: <TrendingUp size={20} className="text-[#FF6B00]" /> },
@@ -460,7 +431,7 @@ const LandingPage = () => {
                         </FadeIn>
                     ))}
                 </div>
-            </div>
+            </div>}
 
             {/* ══════════════════════════════════════════════════════════
                 BUSINESS STRESS
@@ -519,29 +490,18 @@ const LandingPage = () => {
                             {t.methodTitle}<br />
                             <span className="text-[#FF6B00] text-4xl">{t.methodAccent}</span>
                         </h2>
-                        <p className="text-slate-500 leading-relaxed text-lg sm:text-xl mb-10">{t.methodDesc}</p>
+                        <p className="text-slate-600 leading-relaxed text-base sm:text-lg mb-8">{t.methodDesc}</p>
 
-                        <div className="bg-slate-50 border border-slate-100 p-8 rounded-3xl shadow-sm mb-10">
-                            <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-6">
-                                {t.methodDesignTitle}
-                            </h3>
-                            <ul className="space-y-5">
-                                {t.methodDesignList.map((item, i) => (
-                                    <li key={i} className="flex items-center gap-4">
-                                        <div className="w-8 h-8 rounded-full bg-[#FF6B00]/10 text-[#FF6B00] flex items-center justify-center shrink-0">
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                        </div>
-                                        <span className="text-slate-700 font-medium text-lg">{item}</span>
-                                    </li>
-                                ))}
-                            </ul>
+                        <div className="bg-slate-50 border border-slate-100 p-6 sm:p-8 rounded-3xl shadow-sm mb-10">
+                            <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-3">{t.methodDifferenceTitle}</h3>
+                            <p className="text-slate-700 text-base sm:text-lg leading-relaxed">{t.methodDifference}</p>
                         </div>
 
                         <button
                             className="w-full sm:w-auto inline-flex justify-center items-center gap-2 bg-[#FF6B00] hover:bg-[#E66000] text-white font-bold px-8 py-4 rounded-xl shadow-lg shadow-[#FF6B00]/25 transition-all hover:shadow-[#FF6B00]/40 hover:-translate-y-0.5 active:translate-y-0"
-                            onClick={() => navigate('/discover')}
+                            onClick={() => navigate('/discover#methode')}
                         >
-                            {t.learnMore} <ArrowRight size={17} />
+                            {t.methodCta} <ArrowRight size={17} />
                         </button>
                     </FadeIn>
 
@@ -552,7 +512,7 @@ const LandingPage = () => {
                         {[
                             {
                                 key: 'Str',
-                                title: <>{t.strTitlePart1}<TypewriterWord word1={t.strWord1} word2={t.strWord2} /></>,
+                                title: <>{t.strTitlePart1}{t.strWord1}</>,
                                 desc: t.strDesc
                             },
                             { key: 'A', title: t.aTitle, desc: t.aDesc },
@@ -588,7 +548,7 @@ const LandingPage = () => {
                     </FadeIn>
 
                     <div className="grid lg:grid-cols-3 gap-6">
-                        {/* StrAP Perf Diagnostic™ */}
+                        {/* STRAP Perf Diagnostic™ */}
                         <FadeIn delay={200} className="h-full">
                             <div onClick={() => navigate('/tool/strap-diagnosis')} className="h-full bg-white rounded-2xl border border-slate-100 shadow-sm flex flex-col group hover:shadow-md hover:border-orange-200 hover:bg-[#FFF8F4] transition-all cursor-pointer">
                                 <div className="p-8 flex-1 flex flex-col">
@@ -634,7 +594,7 @@ const LandingPage = () => {
                             </div>
                         </FadeIn>
 
-                        {/* StrAPilot */}
+                        {/* STRAPilot */}
                         <FadeIn delay={400} className="h-full">
                             <div onClick={() => navigate('/tool/strapilot')} className="h-full bg-white rounded-2xl border border-slate-100 shadow-sm flex flex-col group hover:shadow-md hover:border-orange-200 hover:bg-[#FFF8F4] transition-all cursor-pointer">
                                 <div className="p-8 flex-1 flex flex-col">
@@ -658,6 +618,72 @@ const LandingPage = () => {
                         </FadeIn>
                     </div>
                 </div>
+            </section>
+
+            {/* ══════════════════════════════════════════════════════════
+                INDUSTRIAL PROOF — Aperam Imphy
+            ══════════════════════════════════════════════════════════ */}
+            <section id="proof" className="py-24 px-6 bg-white">
+                <FadeIn delay={100} className="max-w-6xl mx-auto">
+                    <div className="grid lg:grid-cols-5 gap-10 items-center bg-slate-900 rounded-3xl p-8 sm:p-12 text-white">
+                        <div className="lg:col-span-3">
+                            <div className="inline-flex items-center gap-2 mb-4 text-xs font-bold uppercase tracking-[0.12em] text-[#FF6B00]">
+                                <Factory size={14} /> {t.proofTag}
+                            </div>
+                            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-4">{t.proofTitle}</h2>
+                            <p className="text-slate-300 leading-relaxed mb-8">{t.proofBody}</p>
+                            <button onClick={() => navigate('/discover#aperam')}
+                                className="inline-flex items-center gap-2 bg-[#FF6B00] hover:bg-[#E66000] text-white font-bold px-6 py-3.5 rounded-xl transition-all">
+                                {t.proofLink} <ArrowRight size={17} />
+                            </button>
+                        </div>
+                        <div className="lg:col-span-2 bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-8">
+                            <img src="/media/logos/Logo_aperam_color.png" alt="Aperam" className="h-8 w-auto mb-6 bg-white rounded px-2 py-1" />
+                            <p className="text-xl sm:text-2xl font-bold leading-snug">{t.proofResult}</p>
+                        </div>
+                    </div>
+                </FadeIn>
+            </section>
+
+            {/* ══════════════════════════════════════════════════════════
+                STRAP MAINTENANCE — teaser (no live demo until tested)
+            ══════════════════════════════════════════════════════════ */}
+            <section id="strap-maintenance" className="pb-24 px-6 bg-white">
+                <FadeIn delay={100} className="max-w-6xl mx-auto">
+                    <div className="grid lg:grid-cols-2 gap-10 items-center border border-slate-200 rounded-3xl p-8 sm:p-12 bg-slate-50">
+                        <div>
+                            <div className="inline-flex items-center gap-2 mb-4 text-xs font-bold uppercase tracking-[0.12em] text-[#FF6B00]">
+                                <Wrench size={14} /> {t.maintTag}
+                            </div>
+                            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-4">{t.maintTitle}</h2>
+                            <p className="text-lg text-slate-800 font-semibold mb-3">{t.maintQuestion}</p>
+                            <p className="text-slate-600 leading-relaxed">{t.maintBody}</p>
+                        </div>
+                        <div className="flex flex-col gap-4">
+                            <div className="grid grid-cols-3 gap-3 text-center text-xs font-bold uppercase tracking-wider">
+                                <div className="rounded-xl bg-red-50 border border-red-100 text-red-700 py-4">{lang === 'fr' ? 'Rouge' : 'Red'}</div>
+                                <div className="rounded-xl bg-amber-50 border border-amber-200 text-amber-700 py-4">{lang === 'fr' ? 'Jaune' : 'Yellow'}</div>
+                                <div className="rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 py-4">{lang === 'fr' ? 'Vert' : 'Green'}</div>
+                            </div>
+                            <p className="text-sm text-slate-600">{t.maintComplement}</p>
+                            <span className="inline-flex self-start items-center gap-2 text-xs font-bold uppercase tracking-wider bg-white border border-slate-200 text-slate-600 px-3 py-1.5 rounded-full">
+                                <Clock size={13} className="text-[#FF6B00]" /> {t.maintSoon}
+                            </span>
+                            <div className="flex flex-col sm:flex-row gap-3">
+                                <button onClick={() => navigate('/discover#strap-maintenance')}
+                                    className="inline-flex justify-center items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-bold px-6 py-3.5 rounded-xl transition-all">
+                                    {t.maintLink} <ArrowRight size={17} />
+                                </button>
+                                {MAINTENANCE_DEMO_PUBLIC && (
+                                    <button onClick={() => navigate('/strap-software/maintenance/demo')}
+                                        className="inline-flex justify-center items-center gap-2 border border-slate-300 text-slate-700 font-semibold px-6 py-3.5 rounded-xl hover:bg-white transition-all">
+                                        {t.maintDemo}
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </FadeIn>
             </section>
 
             {/* ══════════════════════════════════════════════════════════

@@ -12,7 +12,7 @@ const translations = {
         dashboard: "Dashboard",
         menu: "Menu",
         tagline: "Discover What Your Operations Are Really Costing You",
-        description: "A fast, AI-powered diagnostic that evaluates your organization across 5 critical performance dimensions—pilotage, anticipation, loss management, operational discipline, and reactivity. In just 3 minutes, get your StrAP Index, identify hidden inefficiencies, and estimate the financial impact of your operational losses.",
+        description: "A fast, AI-powered diagnostic that evaluates your organization across 5 critical performance dimensions—pilotage, anticipation, loss management, operational discipline, and reactivity. In just 3 minutes, get your STRAP Index, identify hidden inefficiencies, and estimate the financial impact of your operational losses.",
         point1: "Identify invisible inefficiencies",
         point2: "Benchmark your operational maturity",
         point3: "Estimate financial losses (€ / year)",
@@ -20,7 +20,7 @@ const translations = {
         pain1: "Recurring problems",
         pain2: "Lack of real-time visibility",
         pain3: "Losses not quantified",
-        transitionText: "The StrAP Performance Diagnostic™ gives you a fast, structured way to assess your operational maturity and identify where performance is leaking.",
+        transitionText: "The STRAP Performance Diagnostic™ gives you a fast, structured way to assess your operational maturity and identify where performance is leaking.",
         howItWorksTag: "HOW IT WORKS",
         howItWorksTitle: "A diagnosis based on 5 critical dimensions",
         dim1: "Pilotage (real-time visibility)",
@@ -28,7 +28,7 @@ const translations = {
         dim3: "Loss quantification",
         dim4: "Anticipation capability",
         dim5: "Operational discipline",
-        cta: "Open StrAP Diagnosis",
+        cta: "Open STRAP Diagnosis",
         ctaLoggedIn: "Go to Dashboard",
         feature1Title: "AI Root Cause Extraction",
         feature1Desc: "Paste chaotic notes, meeting transcripts, or vague problem statements. The AI structures them into actionable root causes.",
@@ -46,7 +46,7 @@ const translations = {
         dashboard: "Tableau de Bord",
         menu: "Menu",
         tagline: "Découvrez ce que vos opérations vous coûtent réellement",
-        description: "Un diagnostic rapide par IA qui évalue votre organisation selon 5 dimensions critiques de performance—pilotage, anticipation, gestion des pertes, discipline opérationnelle et réactivité. En seulement 3 minutes, obtenez votre Indice StrAP, identifiez les inefficacités cachées et estimez l'impact financier de vos pertes opérationnelles.",
+        description: "Un diagnostic rapide par IA qui évalue votre organisation selon 5 dimensions critiques de performance—pilotage, anticipation, gestion des pertes, discipline opérationnelle et réactivité. En seulement 3 minutes, obtenez votre Indice STRAP, identifiez les inefficacités cachées et estimez l'impact financier de vos pertes opérationnelles.",
         point1: "Identifier les inefficacités invisibles",
         point2: "Évaluer votre maturité opérationnelle",
         point3: "Estimer les pertes financières (€ / an)",
@@ -54,7 +54,7 @@ const translations = {
         pain1: "Problèmes récurrents",
         pain2: "Manque de visibilité en temps réel",
         pain3: "Pertes non quantifiées",
-        transitionText: "Le Diagnostic de Performance StrAP™ vous offre un moyen rapide et structuré d'évaluer votre maturité opérationnelle et d'identifier où la performance fuit.",
+        transitionText: "Le Diagnostic de Performance STRAP™ vous offre un moyen rapide et structuré d'évaluer votre maturité opérationnelle et d'identifier où la performance fuit.",
         howItWorksTag: "COMMENT ÇA MARCHE",
         howItWorksTitle: "Un diagnostic axé sur 5 dimensions critiques",
         dim1: "Pilotage (visibilité temps réel)",
@@ -62,7 +62,7 @@ const translations = {
         dim3: "Quantification des pertes",
         dim4: "Capacité d'anticipation",
         dim5: "Discipline opérationnelle",
-        cta: "Ouvrir StrAP Diagnosis",
+        cta: "Ouvrir STRAP Diagnosis",
         ctaLoggedIn: "Accéder au Tableau de Bord",
         feature1Title: "Extraction de Causes par l'IA",
         feature1Desc: "Copiez des notes chaotiques, des transcriptions de réunions, ou des problèmes vagues. L'IA les structure en causes racines actionnables.",
@@ -102,7 +102,7 @@ const StrapDiag = () => {
                     <ArrowLeft size={18} /> <span className="hidden sm:inline">{t.back}</span>
                 </button>
                 <div className="flex items-center gap-2">
-                    <span className="text-xl font-bold tracking-tight text-slate-900">StrAP Tools</span>
+                    <span className="text-xl font-bold tracking-tight text-slate-900">STRAP Tools</span>
                 </div>
 
                 {/* Desktop Menu */}
@@ -200,7 +200,7 @@ const StrapDiag = () => {
                     <Brain className="text-[#FF6B00]" size={40} />
                 </div>
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 text-slate-900 leading-tight">
-                    StrAP Performance Diagnostic
+                    STRAP Performance Diagnostic
                 </h1>
                 <p className="text-lg sm:text-xl text-[#FF6B00] font-bold mb-8 uppercase tracking-widest relative inline-block">
                     {t.tagline}

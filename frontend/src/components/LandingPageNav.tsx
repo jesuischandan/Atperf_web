@@ -16,7 +16,7 @@ const T = {
         logIn: 'Log in',
         signUp: 'Sign up',
         admin: 'Admin',
-        tools: 'StrAP Tools',
+        tools: 'STRAP Tools',
     },
     fr: {
         navHome: 'Accueil',
@@ -29,7 +29,7 @@ const T = {
         logIn: 'Connexion',
         signUp: 'S’inscrire',
         admin: 'Admin',
-        tools: 'StrAP Tools',
+        tools: 'STRAP Tools',
     }
 };
 

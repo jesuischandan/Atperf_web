@@ -647,7 +647,7 @@ export default function AdminUseCases({ currentUser, currentStaff, lang }: any) 
                                             <div>
                                                 <label className="block text-sm font-bold text-slate-700 mb-1.5">Voice of the Client (Testimonial)</label>
                                                 <div className="space-y-3">
-                                                    <textarea value={formData.testimonial_quote} onChange={e => setFormData({...formData, testimonial_quote: e.target.value})} rows={2} placeholder="“StrAP Workflow has transformed our supplier management...”" className="w-full border border-slate-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500/40 outline-none transition-all resize-none" />
+                                                    <textarea value={formData.testimonial_quote} onChange={e => setFormData({...formData, testimonial_quote: e.target.value})} rows={2} placeholder="“STRAP Workflow has transformed our supplier management...”" className="w-full border border-slate-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500/40 outline-none transition-all resize-none" />
                                                     <input type="text" value={formData.testimonial_author} onChange={e => setFormData({...formData, testimonial_author: e.target.value})} placeholder="— Jean-Christophe Trontin, Head of Industrial Strategy" className="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500/40 outline-none transition-all" />
                                                 </div>
                                             </div>

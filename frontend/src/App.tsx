@@ -23,10 +23,12 @@ import StrapMaintenanceDemo from './components/maintenance/StrapMaintenanceDemo'
 import ToolsLayout from './components/layout/ToolsLayout';
 import MaintenanceHome from './components/maintenance/cockpit/MaintenanceHome';
 import MaintenanceCockpit from './components/maintenance/cockpit/MaintenanceCockpit';
+import ScrollToHash from './components/ScrollToHash';
 
 function App() {
     return (
         <BrowserRouter>
+            <ScrollToHash />
             <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/login" element={<Login />} />
@@ -45,7 +47,7 @@ function App() {
                 <Route path="/strap-software" element={<Navigate to="/strap-software/maintenance" replace />} />
                 <Route path="/strap-software/maintenance" element={<StrapSoftwareMaintenancePage />} />
                 <Route path="/strap-software/maintenance/demo" element={<StrapMaintenanceDemo />} />
-                {/* Logged-in StrAP tools share the sidebar shell */}
+                {/* Logged-in STRAP tools share the sidebar shell */}
                 <Route element={<ToolsLayout />}>
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/submit" element={<SubmitForm />} />

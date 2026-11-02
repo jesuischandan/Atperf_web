@@ -15,7 +15,7 @@ class StrapAIResponse(BaseModel):
 def build_strap_prompt(answers: dict, score_100: int, category: str, loss_min: float, loss_max: float) -> str:
     return f"""
 DIAGNOSTIC DATA:
-- Indice StrAP: {score_100}/100
+- Indice STRAP: {score_100}/100
 - Catégorie: {category}
 - Fuite de rentabilité estimée: {loss_min}% à {loss_max}% du Chiffre d'Affaires total.
 
