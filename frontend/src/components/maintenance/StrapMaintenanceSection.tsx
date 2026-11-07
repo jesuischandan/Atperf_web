@@ -10,16 +10,13 @@ import { MAINTENANCE_DEMO_PUBLIC } from '../../utils/siteConfig';
 
 const T = {
     fr: {
-        eyebrow: 'STRAP Maintenance',
-        title: 'De l’anticipation des rebuts à l’anticipation des pannes.',
-        intro: 'Dans les organisations industrielles, des Avis et Ordres de Travail sont différés ou restent en attente. Certains peuvent constituer des signaux précoces de défaillances futures.',
-        aimsTitle: 'STRAP Maintenance vise à :',
-        aims: [
-            'analyser les historiques d’Avis, d’OT et de pannes ;',
-            'rechercher des liens possibles entre événements différés et défaillances ;',
-            'définir des critères de risque : criticité, symptômes, récurrence, délais ;',
-            'prioriser les situations et organiser les arbitrages quotidiens Production / Maintenance.',
-        ],
+        eyebrow: 'STRAP Software Maintenance',
+        title: 'Anticiper les pannes avant qu’elles ne surviennent.',
+        hook: 'Et si les Avis de maintenance différés d’aujourd’hui devenaient les pannes de production de demain ?',
+        intro: 'STRAP Software Maintenance vise à aider les équipes Production et Maintenance à identifier et prioriser, chaque jour, les Avis et Ordres de Travail différés les plus critiques (flux JAUNE) susceptibles d’entraîner des défaillances d’équipement et des arrêts de production non planifiés (flux ROUGE).',
+        method: 'À partir des historiques de maintenance, des symptômes récurrents, de la criticité des équipements et des règles métier, une matrice dynamique de priorisation mettra en évidence les situations nécessitant une action préventive.',
+        objective: 'L’objectif est simple : agir aujourd’hui sur les bons JAUNES pour éviter demain des pannes ROUGES coûteuses.',
+        demoNote: 'Le démonstrateur illustrera ce processus d’anticipation et son intégration dans les décisions quotidiennes Production / Maintenance, en complément de SAP PM, des GMAO et d’ARMP.',
         status: 'En développement — démonstrateur interactif prochainement disponible',
         flows: [
             { key: 'red', label: 'Flux rouge', desc: 'Panne ou défaillance corrective.' },
@@ -33,7 +30,6 @@ const T = {
         priorityDesc: 'Identifier les Avis JAUNES susceptibles d’évoluer vers une panne ROUGE et décider des actions à engager.',
         cockpitTitle: 'Cockpit Production / Maintenance',
         cockpitTags: ['Arbitrage quotidien', 'Actions anticipatives', 'Validation humaine'],
-        positioning: 'STRAP Software Maintenance vise à fournir une couche digitale d’anticipation et d’aide à la décision complémentaire à SAP PM, aux GMAO et à ARMP.',
         caveat: 'Application actuellement en développement et démonstration ; son efficacité devra être évaluée sur les données et processus de chaque site.',
         cta: 'Échanger sur une application STRAP Maintenance',
         demo: 'Essayer le démonstrateur',
@@ -41,16 +37,13 @@ const T = {
         more: 'En savoir plus',
     },
     en: {
-        eyebrow: 'STRAP Maintenance',
-        title: 'From anticipating scrap to anticipating breakdowns.',
-        intro: 'In industrial organisations, maintenance notifications and work orders get deferred or remain pending. Some of them may be early signals of future failures.',
-        aimsTitle: 'STRAP Maintenance aims to:',
-        aims: [
-            'analyse notification, work-order and breakdown history;',
-            'look for possible links between deferred events and failures;',
-            'define risk criteria: criticality, symptoms, recurrence, delays;',
-            'prioritise situations and organise daily Production / Maintenance arbitration.',
-        ],
+        eyebrow: 'STRAP Software Maintenance',
+        title: 'Anticipate breakdowns before they happen.',
+        hook: 'What if today’s deferred maintenance notifications become tomorrow’s production breakdowns?',
+        intro: 'STRAP Software Maintenance aims to help Production and Maintenance teams identify and prioritise, every day, the most critical deferred maintenance notifications and work orders (YELLOW flow) that could potentially lead to equipment failures and unplanned production stops (RED flow).',
+        method: 'Using maintenance history, recurring symptoms, equipment criticality and business rules, a dynamic prioritisation matrix will highlight the situations requiring preventive action.',
+        objective: 'The objective is simple: act on the right YELLOW issues today to avoid costly RED breakdowns tomorrow.',
+        demoNote: 'The demonstrator will illustrate this anticipation process and its integration into daily Production/Maintenance decision-making, as a complement to SAP PM, CMMS tools and ARMP.',
         status: 'In development — interactive demonstrator coming soon',
         flows: [
             { key: 'red', label: 'Red flow', desc: 'Breakdown or corrective failure.' },
@@ -64,7 +57,6 @@ const T = {
         priorityDesc: 'Identify YELLOW notifications likely to evolve into a RED breakdown and decide which actions to take.',
         cockpitTitle: 'Production / Maintenance cockpit',
         cockpitTags: ['Daily arbitration', 'Anticipatory actions', 'Human validation'],
-        positioning: 'STRAP Software Maintenance aims to provide a digital layer for anticipation and decision support that complements SAP PM, CMMS tools and ARMP.',
         caveat: 'Application currently in development and demonstration; its effectiveness will have to be assessed on each site’s data and processes.',
         cta: 'Discuss a STRAP Maintenance application',
         demo: 'Try the demonstrator',
@@ -100,11 +92,13 @@ export default function StrapMaintenanceSection({ lang, showMoreLink = true }: {
                         <span className="w-6 h-px bg-[#FF6B00]" /> {t.eyebrow}
                     </div>
                     <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 mb-5 tracking-tight leading-tight">{t.title}</h2>
-                    <p className="text-slate-700 text-lg max-w-3xl mb-5">{t.intro}</p>
-                    <p className="font-semibold text-slate-800 mb-2">{t.aimsTitle}</p>
-                    <ul className="list-disc pl-5 space-y-1 text-slate-600 max-w-3xl mb-6">
-                        {t.aims.map(a => <li key={a}>{a}</li>)}
-                    </ul>
+                    <p className="text-xl sm:text-2xl font-semibold text-[#FF6B00] max-w-3xl mb-6 leading-snug">{t.hook}</p>
+                    <div className="space-y-4 text-slate-700 text-lg max-w-3xl mb-6">
+                        <p>{t.intro}</p>
+                        <p>{t.method}</p>
+                        <p className="font-bold text-slate-900">{t.objective}</p>
+                        <p className="text-slate-600 text-base">{t.demoNote}</p>
+                    </div>
                     <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider bg-white border border-slate-200 text-slate-600 px-3 py-1.5 rounded-full">
                         <span className="w-2 h-2 rounded-full bg-[#FF6B00] animate-pulse" /> {t.status}
                     </span>
@@ -166,7 +160,6 @@ export default function StrapMaintenanceSection({ lang, showMoreLink = true }: {
 
                 {/* Positioning */}
                 <div className="max-w-3xl mx-auto text-center mt-12 space-y-3">
-                    <p className="text-slate-800 font-semibold">{t.positioning}</p>
                     <p className="text-slate-500 text-sm">{t.caveat}</p>
                 </div>
 

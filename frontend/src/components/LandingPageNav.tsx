@@ -7,6 +7,7 @@ import { logout as endSession } from '../utils/apiClient';
 const T = {
     en: {
         navHome: 'Home',
+        navDiscover: 'Discover STRAP',
         navService: 'Service',
         navSoftware: 'STRAP Software',
         navUseCases: 'Use Cases',
@@ -20,6 +21,7 @@ const T = {
     },
     fr: {
         navHome: 'Accueil',
+        navDiscover: 'Découvrir STRAP',
         navService: 'Services',
         navSoftware: 'STRAP Software',
         navUseCases: 'Cas d’usage',
@@ -52,6 +54,15 @@ export default function LandingPageNav({ lang, onLangChange }: { lang: 'en' | 'f
         setScrolled(window.scrollY > 20);
         return () => window.removeEventListener('scroll', onScroll);
     }, []);
+
+    const navLinks = [
+        { label: t.navHome, href: '/' },
+        { label: t.navDiscover, href: '/discover' },
+        { label: t.navService, href: '/#tools' },
+        { label: t.navSoftware, href: '/strap-software/maintenance' },
+        { label: t.navUseCases, href: '/use-cases' },
+        { label: t.navContact, href: '/contact' },
+    ];
 
     const logout = () => {
         endSession('user');
@@ -87,15 +98,9 @@ export default function LandingPageNav({ lang, onLangChange }: { lang: 'en' | 'f
                         }} 
                     />
 
-                    <div className="hidden md:flex items-center gap-1 text-sm text-slate-500">
-                        {[
-                            { label: t.navHome, href: '/' },
-                            { label: t.navService, href: '/#tools' },
-                            { label: t.navSoftware, href: '/strap-software/maintenance' },
-                            { label: t.navUseCases, href: '/use-cases' },
-                            { label: t.navContact, href: '/contact' },
-                        ].map(({ label, href }) => (
-                            <a key={label} href={href} className="px-4 py-2 rounded-lg hover:bg-slate-100 hover:text-slate-900 transition-all font-medium">{label}</a>
+                    <div className="hidden lg:flex items-center gap-1 text-sm text-slate-500">
+                        {navLinks.map(({ label, href }) => (
+                            <a key={label} href={href} className="px-3 xl:px-4 py-2 rounded-lg hover:bg-slate-100 hover:text-slate-900 transition-all font-medium whitespace-nowrap">{label}</a>
                         ))}
                     </div>
 
@@ -109,7 +114,7 @@ export default function LandingPageNav({ lang, onLangChange }: { lang: 'en' | 'f
                             ))}
                         </div>
 
-                        <div className="hidden md:flex items-center gap-2">
+                        <div className="hidden lg:flex items-center gap-2">
                             {user ? (
                                 <>
                                     <button onClick={() => setIsProfileOpen(true)}
@@ -145,7 +150,7 @@ export default function LandingPageNav({ lang, onLangChange }: { lang: 'en' | 'f
                             )}
                         </div>
 
-                        <button className="md:hidden p-2 rounded-lg hover:bg-slate-100 transition-colors" onClick={() => setIsMobileMenuOpen(true)}>
+                        <button className="lg:hidden p-2 rounded-lg hover:bg-slate-100 transition-colors" onClick={() => setIsMobileMenuOpen(true)}>
                             <Menu size={22} className="text-slate-600" />
                         </button>
                     </div>
@@ -176,13 +181,7 @@ export default function LandingPageNav({ lang, onLangChange }: { lang: 'en' | 'f
                             </button>
                         </div>
                         <div className="flex flex-col gap-2 flex-1">
-                            {[
-                                { label: t.navHome, href: '/' },
-                                { label: t.navService, href: '/#tools' },
-                                { label: t.navSoftware, href: '/strap-software/maintenance' },
-                                { label: t.navUseCases, href: '/use-cases' },
-                                { label: t.navContact, href: '/contact' },
-                            ].map(({ label, href }) => (
+                            {navLinks.map(({ label, href }) => (
                                 <a key={label} href={href} onClick={() => setIsMobileMenuOpen(false)}
                                     className="text-base font-medium text-slate-700 px-3 py-2.5 rounded-lg hover:bg-slate-100 transition-colors">
                                     {label}

@@ -12,6 +12,7 @@ const TRANSLATIONS = {
         logOut: "Log out",
         signUp: "Sign up",
         home: "Home",
+        discover: "Discover STRAP",
         services: "Services",
         software: "STRAP Software",
         useCases: "Use Cases",
@@ -30,6 +31,7 @@ const TRANSLATIONS = {
         logOut: "Déconnexion",
         signUp: "S'inscrire",
         home: "Accueil",
+        discover: "D\u00e9couvrir STRAP",
         services: "Services",
         software: "STRAP Software",
         useCases: "Cas d'usage",
@@ -62,6 +64,7 @@ export default function Footer({ lang }: { lang: 'en' | 'fr' }) {
                         </div>
                         <nav className="flex flex-col gap-3 font-medium">
                             <a href="/" className="text-slate-500 hover:text-[#FF6B00] transition-colors">{t.home}</a>
+                            <a href="/discover" className="text-slate-500 hover:text-[#FF6B00] transition-colors">{t.discover}</a>
                             <a href="/#tools" className="text-slate-500 hover:text-[#FF6B00] transition-colors">{t.services}</a>
                             <a href="/strap-software/maintenance" className="text-slate-500 hover:text-[#FF6B00] transition-colors">{t.software}</a>
                             <a href="/use-cases" className="text-slate-500 hover:text-[#FF6B00] transition-colors">{t.useCases}</a>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Loader2, Brain, AlertCircle, Activity, TrendingDown, Download, Mail } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Loader2, Brain, AlertCircle, Activity, TrendingDown, Download, Mail, Zap } from 'lucide-react';
 import EmailModal from './EmailModal';
 import { generateStrapDiagPDF } from '../utils/pdfGenerator';
 

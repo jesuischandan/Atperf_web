@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, AlertTriangle, Lightbulb, TrendingUp, Zap, ChevronRight, Search, Settings2, MonitorSmartphone, Factory, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, AlertTriangle, Lightbulb, TrendingUp, Zap, ChevronRight, Search, Settings2, MonitorSmartphone, Factory, CheckCircle2, ArrowDown, RefreshCw } from 'lucide-react';
 import LandingPageNav from './LandingPageNav';
 import Footer from './Footer';
 import StrapMaintenanceSection from './maintenance/StrapMaintenanceSection';
@@ -114,9 +114,9 @@ const T = {
         howTitle: 'How does STRAP® work in practice?',
         howSubtitle: 'A structured approach in three phases, from field diagnosis to operational anticipation.',
         howSteps: [
-            { title: 'AS IS', desc: 'We map the key industrial processes, their flows, anomalies and management practices. We identify the situations that generate losses, the causes of deviations and the data available to characterise them.' },
-            { title: 'TO BE', desc: 'With your teams, we define risk criteria, business rules, alert thresholds and the actions to take. Depending on the process, situations can be characterised as red, yellow and green flows: actual incidents, risks and situations under control.' },
-            { title: 'DIGITALISATION', desc: 'We digitalise the anticipation rules, alerts, indicators and decision routines. STRAP Software makes risks, priorities and action follow-up visible, building on existing systems wherever possible.' },
+            { title: 'AS IS', desc: 'We map the actual industrial process: its flows, anomalies, historical events and losses. We identify the situations that generate losses, the causes of deviations and the data available to characterise them.' },
+            { title: 'TO BE', desc: 'With your teams, we define the anticipation criteria, business rules and dynamic prioritisation, along with alert thresholds and the actions to take. Depending on the process, situations can be characterised as red, yellow and green flows: actual incidents, risks and situations under control.' },
+            { title: 'DIGITALISATION', desc: 'We implement STRAP Software: alerts, KPIs and daily operational management routines. It makes risks, priorities and action follow-up visible, building on existing systems wherever possible.' },
         ],
         howClosing: 'STRAP® does not start with software. It starts with understanding the industrial process and the decisions to anticipate.',
         termsTitle: 'Four names, one approach',
@@ -126,6 +126,31 @@ const T = {
             { name: 'STRAP Tools', desc: 'Online tools to get started: performance diagnostic, Decision Radar, STRAPilot.' },
             { name: 'STRAP Maintenance', desc: 'An application of STRAP Software to the maintenance process — in development.' },
         ],
+
+        // Anticipation diagram (after the 3 phases, before the video)
+        diag: {
+            tag: 'The STRAP® anticipation logic',
+            title: 'STRAP® — From the industrial process to anticipating losses',
+            intro: 'The matrix combines historical data, updated operational events and process-specific business rules to identify and dynamically prioritise risks before they become incidents or losses.',
+            processTitle: 'Key industrial process',
+            processDesc: 'Map the flows, events, anomalies and potential losses',
+            flows: [
+                { key: 'red', label: 'RED', desc: 'Actual incident or loss' },
+                { key: 'yellow', label: 'YELLOW', desc: 'Risk or drift to anticipate' },
+                { key: 'green', label: 'GREEN', desc: 'Situation under control' },
+            ],
+            matrixTitle: 'Dynamic anticipation & prioritisation matrix',
+            matrixInputs: ['Historical data', 'Updated events', 'Business rules'],
+            matrixCriteria: ['Criticality and impact', 'Recurrence and history', 'Symptoms and weak signals', 'Delays and risk evolution'],
+            matrixOutput: 'Explainable priority, reassessed as data becomes available',
+            softwareTitle: 'STRAP Software + daily management routines',
+            routine: ['Alert', 'Prioritise', 'Decide', 'Act', 'Follow up'],
+            feedback: 'Lessons learned and continuous improvement of the anticipation rules',
+            notes: [
+                'Flows, criteria and prioritisation rules are adapted to each industrial process. The dynamic anticipation matrix is updated from the data in existing systems (ERP, MRP, CMMS…), depending on the connections available.',
+                'The red, yellow and green flows illustrate an anticipatory management logic specific to each process, not a universal classification.',
+            ],
+        },
 
         // Aperam case
         caseTag: 'STRAP® in action — Aperam Imphy',
@@ -234,9 +259,9 @@ const T = {
         howTitle: 'Comment fonctionne concrètement STRAP® ?',
         howSubtitle: 'Une démarche structurée en trois phases, du diagnostic terrain à l’anticipation opérationnelle.',
         howSteps: [
-            { title: 'AS IS', desc: 'Nous cartographions les processus industriels clés, leurs flux, leurs anomalies et leurs modes de pilotage. Nous identifions les situations générant des pertes, les causes des dérives et les données permettant de les caractériser.' },
-            { title: 'TO BE', desc: 'Avec les équipes, nous définissons les critères de risque, les règles métier, les seuils d’alerte et les actions à engager. Selon le processus, les situations peuvent être caractérisées par des flux rouges, jaunes et verts : incidents avérés, risques et situations maîtrisées.' },
-            { title: 'DIGITALISATION', desc: 'Nous digitalisons les règles d’anticipation, les alertes, les indicateurs et les routines de décision. STRAP Software rend visibles les risques, les priorités et le suivi des actions, en s’appuyant autant que possible sur les systèmes existants.' },
+            { title: 'AS IS', desc: 'Nous cartographions le processus industriel réel : ses flux, ses anomalies, ses événements historiques et ses pertes. Nous identifions les situations générant des pertes, les causes des dérives et les données permettant de les caractériser.' },
+            { title: 'TO BE', desc: 'Avec les équipes, nous définissons les critères d’anticipation, les règles métier et la priorisation dynamique, ainsi que les seuils d’alerte et les actions à engager. Selon le processus, les situations peuvent être caractérisées par des flux rouges, jaunes et verts : incidents avérés, risques et situations maîtrisées.' },
+            { title: 'DIGITALISATION', desc: 'Nous mettons en œuvre STRAP Software : alertes, indicateurs (KPI) et routines quotidiennes de pilotage opérationnel. Il rend visibles les risques, les priorités et le suivi des actions, en s’appuyant autant que possible sur les systèmes existants.' },
         ],
         howClosing: 'STRAP® ne commence pas par un logiciel. Il commence par la compréhension du processus industriel et des décisions à anticiper.',
         termsTitle: 'Quatre noms, une même démarche',
@@ -246,6 +271,30 @@ const T = {
             { name: 'STRAP Tools', desc: 'Des outils en ligne pour démarrer : diagnostic de performance, Decision Radar, STRAPilot.' },
             { name: 'STRAP Maintenance', desc: 'Une application de STRAP Software au processus maintenance — en développement.' },
         ],
+
+        diag: {
+            tag: 'La logique d’anticipation STRAP®',
+            title: 'STRAP® — Du processus industriel à l’anticipation des pertes',
+            intro: 'La matrice combine les données historiques, les événements opérationnels actualisés et les règles métier propres au processus pour identifier et prioriser dynamiquement les risques avant qu’ils ne deviennent des incidents ou des pertes.',
+            processTitle: 'Processus industriel clé',
+            processDesc: 'Cartographier les flux, les événements, les anomalies et les pertes potentielles',
+            flows: [
+                { key: 'red', label: 'ROUGE', desc: 'Incident ou perte avérée' },
+                { key: 'yellow', label: 'JAUNE', desc: 'Risque ou dérive à anticiper' },
+                { key: 'green', label: 'VERT', desc: 'Situation maîtrisée' },
+            ],
+            matrixTitle: 'Matrice dynamique d’anticipation et de priorisation',
+            matrixInputs: ['Données historiques', 'Événements actualisés', 'Règles métier'],
+            matrixCriteria: ['Criticité et impact', 'Récurrence et historique', 'Symptômes et signaux faibles', 'Délais et évolution du risque'],
+            matrixOutput: 'Priorité explicable, réévaluée selon les données disponibles',
+            softwareTitle: 'STRAP Software + routines de pilotage',
+            routine: ['Alerter', 'Prioriser', 'Décider', 'Agir', 'Suivre'],
+            feedback: 'Retour d’expérience et amélioration continue des règles d’anticipation',
+            notes: [
+                'Les flux, critères et règles de priorisation sont adaptés à chaque processus industriel. La matrice dynamique d’anticipation s’actualise à partir des données des systèmes existants (ERP, MRP, GMAO…), selon les connexions disponibles.',
+                'Les flux rouge, jaune et vert illustrent une logique de pilotage anticipatif propre à chaque processus, et non une classification universelle.',
+            ],
+        },
 
         caseTag: 'STRAP® en action — Aperam Imphy',
         caseTitle: 'Anticiper les non-conformités des matières premières avant leur utilisation en aciérie.',
@@ -342,6 +391,126 @@ function AutoPlayVideo({ src, poster }: { src: string; poster: string }) {
         >
             Your browser does not support HTML5 video.
         </video>
+    );
+}
+
+/* ─────────────────────────────────────────────────────────────
+   STRAP anticipation diagram
+   Built in HTML (not an image) so it follows the FR/EN switch.
+   Process → red/yellow/green flows → matrix → software + routines.
+───────────────────────────────────────────────────────────── */
+const FLOW_STYLE: Record<string, string> = {
+    red: 'bg-red-50 border-red-200 text-red-700',
+    yellow: 'bg-amber-50 border-amber-200 text-amber-700',
+    green: 'bg-emerald-50 border-emerald-200 text-emerald-700',
+};
+
+function StepNumber({ n }: { n: number }) {
+    return (
+        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#FF6B00] text-white text-sm font-black shrink-0">{n}</span>
+    );
+}
+
+function DownArrow() {
+    return (
+        <div className="flex justify-center py-3" aria-hidden="true">
+            <ArrowDown size={22} className="text-[#FF6B00]" />
+        </div>
+    );
+}
+
+function AnticipationDiagram({ d }: { d: (typeof T)['en']['diag'] }) {
+    return (
+        <section id="anticipation" className="py-24 px-6 bg-slate-50 border-t border-slate-100 scroll-mt-20">
+            <div className="max-w-5xl mx-auto">
+                <FadeIn delay={100} className="text-center mb-12">
+                    <div className="inline-flex items-center gap-2 mb-4 text-xs font-bold uppercase tracking-[0.12em] text-[#FF6B00]">
+                        <span className="w-5 h-px bg-[#FF6B00]" /> {d.tag} <span className="w-5 h-px bg-[#FF6B00]" />
+                    </div>
+                    <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight leading-tight">{d.title}</h2>
+                    <p className="text-slate-600 text-lg max-w-3xl mx-auto">{d.intro}</p>
+                </FadeIn>
+
+                <FadeIn delay={200}>
+                    <figure aria-label={d.title} className="max-w-4xl mx-auto">
+                        {/* 1. Key industrial process */}
+                        <div className="bg-white border border-slate-200 rounded-2xl p-6 text-center shadow-sm">
+                            <div className="flex items-center justify-center gap-3 mb-2">
+                                <StepNumber n={1} />
+                                <h3 className="text-lg sm:text-xl font-extrabold text-slate-900">{d.processTitle}</h3>
+                            </div>
+                            <p className="text-slate-500">{d.processDesc}</p>
+                        </div>
+
+                        <DownArrow />
+
+                        {/* Red / yellow / green flows */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            {d.flows.map(f => (
+                                <div key={f.key} className={`rounded-2xl border p-5 text-center ${FLOW_STYLE[f.key]}`}>
+                                    <div className="font-extrabold tracking-wider text-lg">{f.label}</div>
+                                    <div className="text-sm opacity-90">{f.desc}</div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <DownArrow />
+
+                        {/* 2. Dynamic matrix */}
+                        <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 text-center shadow-sm">
+                            <div className="flex items-center justify-center gap-3 mb-4">
+                                <StepNumber n={2} />
+                                <h3 className="text-lg sm:text-xl font-extrabold text-slate-900">{d.matrixTitle}</h3>
+                            </div>
+                            <div className="flex flex-wrap items-center justify-center gap-2 mb-6">
+                                {d.matrixInputs.map((input, i) => (
+                                    <span key={input} className="inline-flex items-center gap-2">
+                                        {i > 0 && <span className="text-[#FF6B00] font-bold" aria-hidden="true">+</span>}
+                                        <span className="text-sm font-semibold text-slate-700 bg-slate-100 px-3 py-1 rounded-full">{input}</span>
+                                    </span>
+                                ))}
+                            </div>
+                            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+                                {d.matrixCriteria.map(c => (
+                                    <li key={c} className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-slate-700 font-medium">{c}</li>
+                                ))}
+                            </ul>
+                            <p className="font-bold text-slate-900">{d.matrixOutput}</p>
+                        </div>
+
+                        <DownArrow />
+
+                        {/* 3. Software + routines, with feedback loop */}
+                        <div className="bg-slate-900 rounded-2xl p-6 sm:p-8 text-center shadow-lg">
+                            <div className="flex items-center justify-center gap-3 mb-5">
+                                <StepNumber n={3} />
+                                <h3 className="text-lg sm:text-xl font-extrabold text-white">{d.softwareTitle}</h3>
+                            </div>
+                            <ol className="flex flex-wrap items-center justify-center gap-2 mb-6">
+                                {d.routine.map((r, i) => (
+                                    <li key={r} className="inline-flex items-center gap-2">
+                                        {i > 0 && <ArrowRight size={14} className="text-[#FF6B00]" aria-hidden="true" />}
+                                        <span className="text-sm font-semibold text-slate-100 bg-white/10 px-3 py-1.5 rounded-lg">{r}</span>
+                                    </li>
+                                ))}
+                            </ol>
+                            <p className="inline-flex items-center justify-center gap-2 text-slate-300 text-sm">
+                                <RefreshCw size={16} className="text-[#FF6B00] shrink-0" aria-hidden="true" /> {d.feedback}
+                            </p>
+                        </div>
+                    </figure>
+                </FadeIn>
+
+                {/* Note requested under the diagram */}
+                <FadeIn delay={300}>
+                    <div className="max-w-4xl mx-auto mt-10 border-l-4 border-[#FF6B00] bg-white rounded-r-2xl p-6 space-y-3">
+                        {d.notes.map(n => (
+                            <p key={n} className="text-slate-700 leading-relaxed">{n}</p>
+                        ))}
+                    </div>
+                </FadeIn>
+            </div>
+        </section>
     );
 }
 
@@ -588,10 +757,12 @@ export default function DiscoverStrAP() {
                 </div>
             </section>
 
+            <AnticipationDiagram d={t.diag} />
+
             {/* ══════════════════════════════════════════════════════════
                 DEMO VIDEO
             ══════════════════════════════════════════════════════════ */}
-            <section className="py-24 px-6 bg-slate-50 border-y border-slate-100">
+            <section className="py-24 px-6 bg-white">
                 <div className="max-w-5xl mx-auto">
                     <FadeIn delay={100} className="text-center mb-16">
                         <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight">

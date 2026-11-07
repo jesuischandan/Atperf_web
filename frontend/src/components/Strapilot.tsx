@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, UploadCloud, Loader2, Sparkles, AlertCircle, BarChart3, ChevronRight, Check, Download, Mail, Zap, Goal, Target, Crosshair, AlertTriangle, Activity, ShieldAlert, Flag } from 'lucide-react';
+import { ArrowLeft, UploadCloud, Loader2, Sparkles, AlertCircle, BarChart3, ChevronRight, Check, Download, Mail, Zap, Goal, Target, Crosshair, AlertTriangle, Activity, ShieldAlert, Flag, Bot } from 'lucide-react';
 
 import API_URL from '../utils/apiUrl';
 import { generateStrapAnalysisPDF } from '../utils/pdfGenerator';
