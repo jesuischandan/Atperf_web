@@ -360,24 +360,47 @@ function AutoPlayVideo({ src, poster }: { src: string; poster: string }) {
     const videoRef = useRef<HTMLVideoElement>(null);
 
     useEffect(() => {
+        const video = videoRef.current;
+        if (!video) return;
+        video.volume = 1;
+
+        // Browsers block autoplay with sound until the visitor has clicked or
+        // tapped on the site. In that case we start muted and turn the sound
+        // on at the visitor's first click, tap or key press.
+        let autoMuted = false;
+        const unmute = () => {
+            if (autoMuted) {
+                video.muted = false;
+                video.volume = 1;
+                autoMuted = false;
+            }
+            removeUnmuteListeners();
+        };
+        const events = ['pointerdown', 'keydown', 'touchstart'] as const;
+        const removeUnmuteListeners = () => events.forEach(e => document.removeEventListener(e, unmute));
+
+        const play = () => {
+            video.play().catch(() => {
+                autoMuted = true;
+                video.muted = true;
+                video.play().catch(() => { /* autoplay fully blocked: controls remain */ });
+                events.forEach(e => document.addEventListener(e, unmute, { once: true }));
+            });
+        };
+
         const observer = new IntersectionObserver(
             ([entry]) => {
-                if (videoRef.current) {
-                    if (entry.isIntersecting) {
-                        videoRef.current.volume = 0.1; // Minimum volume
-                        videoRef.current.play().catch(err => {
-                            console.log('Autoplay was prevented by browser:', err);
-                        });
-                    } else {
-                        videoRef.current.pause();
-                    }
-                }
+                if (entry.isIntersecting) play();
+                else video.pause();
             },
             { threshold: 0.5 } // Trigger when 50% of the video is visible
         );
 
-        if (videoRef.current) observer.observe(videoRef.current);
-        return () => observer.disconnect();
+        observer.observe(video);
+        return () => {
+            observer.disconnect();
+            removeUnmuteListeners();
+        };
     }, []);
 
     return (
@@ -557,7 +580,7 @@ export default function DiscoverStrAP() {
                     loop
                     playsInline
                     className="absolute inset-0 w-full h-full object-cover z-0 scale-111"
-                    src="/media/videos/STRAP_hero_bg.mp4"
+                    src="/media/videos/StrAP_hero_bg.mp4"
                 />
                 {/* Dark overlay so text stays readable */}
                 <div className="absolute inset-0 bg-slate-900/70 z-10" />
@@ -777,7 +800,7 @@ export default function DiscoverStrAP() {
                         <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200/50 bg-slate-900 aspect-video flex items-center justify-center">
                             {/* Inner glow/shadow for premium feel */}
                             <div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-3xl pointer-events-none z-10" />
-                            <AutoPlayVideo src="/media/videos/STRAP_Demo.mp4" poster="/Logo_Atperf_transpart.png" />
+                            <AutoPlayVideo src="/media/videos/StrAP_Demo.mp4" poster="/Logo_Atperf_transpart.png" />
                         </div>
                     </FadeIn>
                 </div>
